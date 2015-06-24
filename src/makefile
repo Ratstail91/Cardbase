@@ -1,9 +1,9 @@
 #include directories
-INCLUDES+=. common
+INCLUDES+=.
 
 #libraries
 #the order of the $(LIBS) is important, at least for MinGW
-LIBS+=cardlib.a common.a
+LIBS+=
 ifeq ($(OS),Windows_NT)
 	LIBS+=-lmingw32
 endif
@@ -29,7 +29,6 @@ OUT=$(addprefix $(OUTDIR)/,cardbase)
 
 #targets
 all: $(OBJ) $(OUT)
-	$(MAKE) -C common
 	$(CXX) $(CXXFLAGS) -o $(OUT) $(OBJ) $(LIBS)
 
 $(OBJ): | $(OBJDIR)

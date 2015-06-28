@@ -4,6 +4,8 @@
 #include <iostream>
 #include <fstream>
 
+//TODO: print name...
+
 int main(int, char**) {
 	//load the json file
 	std::ifstream is("../rsc/AllCards.json");
@@ -33,7 +35,15 @@ int main(int, char**) {
 	}
 */
 
-	std::cout << j["Treasure Cruise"] << std::endl;
+	//fields
+	for (nlohmann::json::iterator it = j.begin(); it != j.end(); it++) {
+
+		std::cout << std::setw(25) << std::left << (*it)["name"].dump().substr(0, 20);
+		std::cout << std::setw(25) << std::left << (*it)["manaCost"].dump().substr(0, 20);
+		std::cout << std::setw(25) << std::left << (*it)["type"].dump().substr(0, 20);
+		std::cout << std::endl;
+	}
+
 	//done
 	return 0;
 }

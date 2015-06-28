@@ -3599,9 +3599,9 @@ class basic_json
 
             case (value_t::string):
             {
-//                o << string_t("\"");
+                o << string_t("\"");
                 escape_string(o, *m_value.string);
-//                o << "\"";
+                o << "\"";
                 return;
             }
 

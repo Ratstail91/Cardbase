@@ -6,7 +6,7 @@
 
 int main(int, char**) {
 	//load the json file
-	std::ifstream is("../rsc/AllSets.json");
+	std::ifstream is("../rsc/AllCards.json");
 
 	if (!is.is_open()) {
 		std::cerr << "Failed to open the json file" << std::endl;
@@ -18,7 +18,7 @@ int main(int, char**) {
 	j << is;
 	is.close();
 
-	//testing
+/*	//testing
 	for (auto it : j["KTK"]["cards"]) {
 		//the json internals require the call to "dump()" to retrieve a plain string
 		std::cout << std::setw(30) << std::left << it["name"].dump();
@@ -31,7 +31,9 @@ int main(int, char**) {
 		//clear output
 		std::cout << std::endl;
 	}
+*/
 
+	std::cout << j["Treasure Cruise"] << std::endl;
 	//done
 	return 0;
 }

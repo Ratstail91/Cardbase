@@ -24,4 +24,4 @@ out/
 *.sh
 
 #project dependant files
-*.json
+#*.json

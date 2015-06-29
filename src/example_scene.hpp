@@ -19,23 +19,28 @@
  * 3. This notice may not be removed or altered from any source
  * distribution.
 */
-#include "application.hpp"
+#pragma once
 
-#include "SDL2/SDL.h"
+#include "base_scene.hpp"
 
-#include <iostream>
-#include <stdexcept>
+class ExampleScene : public BaseScene {
+public:
+	ExampleScene();
+	~ExampleScene();
 
-int main(int argc, char** argv) {
-	try {
-		Application app;
-		app.Init(argc, argv);
-		app.Proc();
-		app.Quit();
-	}
-	catch(std::exception& e) {
-		std::cerr << "Fatal Error: " << e.what() << std::endl;
-		return 1;
-	}
-	return 0;
-}
+	void RenderFrame(SDL_Renderer* renderer) override;
+
+private:
+	//frame phases
+	void FrameStart() override;
+	void Update() override;
+	void FrameEnd() override;
+
+	//input events
+	void MouseMotion(SDL_MouseMotionEvent const& event) override;
+	void MouseButtonDown(SDL_MouseButtonEvent const& event) override;
+	void MouseButtonUp(SDL_MouseButtonEvent const& event) override;
+	void MouseWheel(SDL_MouseWheelEvent const& event) override;
+	void KeyDown(SDL_KeyboardEvent const& event) override;
+	void KeyUp(SDL_KeyboardEvent const& event) override;
+};

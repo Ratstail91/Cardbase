@@ -19,23 +19,14 @@
  * 3. This notice may not be removed or altered from any source
  * distribution.
 */
-#include "application.hpp"
+#pragma once
 
-#include "SDL2/SDL.h"
+enum SceneSignal {
+	//reserved members for internal use
+	QUIT = -1,
+	CONTINUE = 0,
+	FIRST = 1,
 
-#include <iostream>
-#include <stdexcept>
-
-int main(int argc, char** argv) {
-	try {
-		Application app;
-		app.Init(argc, argv);
-		app.Proc();
-		app.Quit();
-	}
-	catch(std::exception& e) {
-		std::cerr << "Fatal Error: " << e.what() << std::endl;
-		return 1;
-	}
-	return 0;
-}
+	//custom scenes
+	EXAMPLE_SCENE
+};

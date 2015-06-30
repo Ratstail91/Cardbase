@@ -23,6 +23,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <stack>
 #include <stdexcept>
 
 ExampleScene::ExampleScene() {
@@ -76,7 +77,7 @@ void ExampleScene::RenderFrame(SDL_Renderer* renderer) {
 
 		//render mana (if applicable)
 		if (it["manaCost"].type() != nlohmann::json::value_t::null) {
-			RenderText(renderer, it["manaCost"], 300, 32 + 16 * line);
+			RenderManaCost(renderer, it["manaCost"], 300, 32 + 16 * line);
 		}
 
 		//debug
@@ -229,4 +230,40 @@ void ExampleScene::RenderText(SDL_Renderer* renderer, std::string text, int x, i
 	//cleanup
 	SDL_FreeSurface(surface);
 	SDL_DestroyTexture(texture);
+}
+
+void ExampleScene::RenderManaCost(SDL_Renderer* renderer, std::string str, int x, int y) {
+	//hold the parsed codes in reverse order
+	std::stack<std::string> manaCodes;
+
+	//read the raw text
+	char* rawText = (char*)(str.c_str());
+
+	//count the symbols present
+	int count = 0;
+	for (char* it = rawText; *it; it++) {
+		if (*it == '{') {
+			count++;
+		}
+	}
+
+	//read each symbol, and push it to the stack
+	while(count) {
+		while( *(rawText++) != '{'); //find the start of the next symbol
+
+		//read the code
+		char code[8];
+		memset(code, 0, 8);
+		sscanf(rawText, "%[^}]}", code);
+
+		//push
+		manaCodes.emplace(code);
+		count--;
+	}
+
+	//finally, draw the correct symbols
+	while(!manaCodes.empty()) {
+		manaIndex[manaCodes.top()]->DrawTo(renderer, x + 12 * manaCodes.size(), y, .1, .1);
+		manaCodes.pop();
+	}
 }

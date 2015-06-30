@@ -57,6 +57,7 @@ private:
 	void DestroyIndex();
 
 	void RenderText(SDL_Renderer*, std::string, int x, int y);
+	void RenderManaCost(SDL_Renderer*, std::string, int x, int y);
 
 	TTF_Font* font = nullptr;
 	Image masterManaSheet;

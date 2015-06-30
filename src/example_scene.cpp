@@ -70,22 +70,56 @@ void ExampleScene::FrameEnd() {
 }
 
 void ExampleScene::RenderFrame(SDL_Renderer* renderer) {
+	SDL_Texture* name = nullptr;
+	SDL_Texture* manaCost = nullptr;
+	SDL_Rect src, dest;
+
 	int line = 0;
+
 	for (auto& it : cardData) {
 		//render name
-		RenderText(renderer, it["name"], 32, 32 + 16 * line);
+		name = RenderText(renderer, it["name"]);
 
 		//render mana (if applicable)
 		if (it["manaCost"].type() != nlohmann::json::value_t::null) {
-			RenderManaCost(renderer, it["manaCost"], 300, 32 + 16 * line);
+			manaCost = RenderManaCost(renderer, it["manaCost"]);
 		}
 
-		//debug
-		if (line++ > 50) break;
+		//get the stats for name, then draw
+		src = SDL_Rect{0, 0};
+		SDL_QueryTexture(name, nullptr, nullptr, &src.w, &src.h);
+		dest = SDL_Rect{32, 32 + 16 * line, src.w, src.h};
+		SDL_RenderCopy(renderer, name, &src, &dest);
+
+		//cleanup
+		SDL_DestroyTexture(name);
+
+		if (manaCost) {
+			//get the stats for manaCost, then draw
+			src = SDL_Rect{0, 0};
+			SDL_QueryTexture(manaCost, nullptr, nullptr, &src.w, &src.h);
+			dest = SDL_Rect{300, 32 + 16 * line, src.w, src.h};
+			SDL_RenderCopy(renderer, manaCost, &src, &dest);
+
+			//cleanup
+			SDL_DestroyTexture(manaCost);
+		}
+
+		//emergency cap
+		if (line++ >= 50) break;
 	}
 
-	//testing the mana display
-//	manaIndex.at("G")->DrawTo(renderer, 32, 300, .2, .2);
+	//DEBUG: draw the number of cards
+	char debug[64];
+	sprintf(debug, "Cards indexed: %lu", cardData.size());
+	SDL_Texture* indexCount = RenderText(renderer, debug);
+	src = SDL_Rect{0, 0};
+	SDL_QueryTexture(indexCount, nullptr, nullptr, &src.w, &src.h);
+	dest = SDL_Rect{800 - 16 - src.w, 16, src.w, src.h};
+	SDL_RenderCopy(renderer, indexCount, &src, &dest);
+
+	//cleanup
+	SDL_DestroyTexture(manaCost);
 }
 
 //-------------------------
@@ -201,12 +235,11 @@ void ExampleScene::DestroyIndex() {
 	manaIndex.clear();
 }
 
-void ExampleScene::RenderText(SDL_Renderer* renderer, std::string text, int x, int y) {
+SDL_Texture* ExampleScene::RenderText(SDL_Renderer* renderer, std::string text) {
 	//DOCS: quick and dirty
 	SDL_Color color = {255, 255, 255, 255}; //white
-	SDL_Rect rect = {x, y};
 
-	//make the surface
+	//make the surface (from SDL_ttf)
 	SDL_Surface* surface = TTF_RenderText_Solid(font, text.c_str(), color);
 	if (!surface) {
 		throw(std::runtime_error("Failed to create a TTF surface"));
@@ -219,51 +252,62 @@ void ExampleScene::RenderText(SDL_Renderer* renderer, std::string text, int x, i
 		throw(std::runtime_error("Failed to create a TTF texture"));
 	}
 
-	//prevent warping
-	SDL_QueryTexture(texture, nullptr, nullptr, &rect.w, &rect.h);
-
-	//render
-	if (SDL_RenderCopy(renderer, texture, nullptr, &rect)) {
-		std::cerr << "Failed to render a texture" << std::endl;
-	}
-
 	//cleanup
 	SDL_FreeSurface(surface);
-	SDL_DestroyTexture(texture);
+
+	//NOTE: free the texture yourself
+	return texture;
 }
 
-void ExampleScene::RenderManaCost(SDL_Renderer* renderer, std::string str, int x, int y) {
+SDL_Texture* ExampleScene::RenderManaCost(SDL_Renderer* renderer, std::string str) {
 	//hold the parsed codes in reverse order
 	std::stack<std::string> manaCodes;
 
-	//read the raw text
+	//get the raw text
 	char* rawText = (char*)(str.c_str());
 
 	//count the symbols present
 	int count = 0;
 	for (char* it = rawText; *it; it++) {
+		//assume that all symbols start with '{'
 		if (*it == '{') {
 			count++;
 		}
 	}
 
 	//read each symbol, and push it to the stack
-	while(count) {
-		while( *(rawText++) != '{'); //find the start of the next symbol
+	char code[8];
+	while(count--) {
+		while(*(rawText++) != '{'); //find the start of the next symbol
 
 		//read the code
-		char code[8];
 		memset(code, 0, 8);
-		sscanf(rawText, "%[^}]}", code);
+		sscanf(rawText, "%[^}]", code);
 
 		//push
 		manaCodes.emplace(code);
-		count--;
 	}
 
-	//finally, draw the correct symbols
+	//make a new texture to return
+	SDL_Texture* texture = SDL_CreateTexture(
+		renderer,
+		SDL_PIXELFORMAT_RGBA8888,
+		SDL_TEXTUREACCESS_TARGET,
+		12 * manaCodes.size(), //use 12px sizes to match the text
+		12
+		);
+
+	//draw to the texture
+	SDL_SetRenderTarget(renderer, texture);
+	SDL_RenderClear(renderer);
+
 	while(!manaCodes.empty()) {
-		manaIndex[manaCodes.top()]->DrawTo(renderer, x + 12 * manaCodes.size(), y, .1, .1);
+		manaIndex.at(manaCodes.top())->DrawTo(renderer, 1 + 12 * (manaCodes.size() -1), 1, .1, .1);
 		manaCodes.pop();
 	}
+
+	SDL_SetRenderTarget(renderer, nullptr);
+
+	//return this texture
+	return texture;
 }

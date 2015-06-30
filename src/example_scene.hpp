@@ -22,8 +22,12 @@
 #pragma once
 
 #include "base_scene.hpp"
+#include "image.hpp"
 
 #include "SDL2/SDL_ttf.h"
+
+#include <string>
+#include <map>
 
 class ExampleScene : public BaseScene {
 public:
@@ -46,6 +50,12 @@ private:
 	void KeyDown(SDL_KeyboardEvent const& event) override;
 	void KeyUp(SDL_KeyboardEvent const& event) override;
 
-	//
+	//misc
+	void PopulateIndex(std::string, SDL_Rect);
+	void CreateIndex();
+	void DestroyIndex();
+
 	TTF_Font* font = nullptr;
+	Image masterManaSheet;
+	std::map<std::string, Image*> manaIndex;
 };

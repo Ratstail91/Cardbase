@@ -23,6 +23,7 @@
 
 #include "base_scene.hpp"
 #include "image.hpp"
+#include "json.hpp"
 
 #include "SDL2/SDL_ttf.h"
 
@@ -55,7 +56,10 @@ private:
 	void CreateIndex();
 	void DestroyIndex();
 
+	void RenderText(SDL_Renderer*, std::string, int x, int y);
+
 	TTF_Font* font = nullptr;
 	Image masterManaSheet;
 	std::map<std::string, Image*> manaIndex;
+	nlohmann::json cardData;
 };

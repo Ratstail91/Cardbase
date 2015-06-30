@@ -21,6 +21,7 @@
 */
 #include "example_scene.hpp"
 
+#include <fstream>
 #include <iostream>
 #include <stdexcept>
 
@@ -32,9 +33,18 @@ ExampleScene::ExampleScene() {
 		throw(std::runtime_error("Failed to load font file"));
 	}
 
+	//graphics
 	masterManaSheet.Load(GetRenderer(), "../rsc/Mana.png");
-
 	CreateIndex();
+
+	//read and store the .json file
+	std::ifstream is("../rsc/AllCards.json");
+
+	if (!is.is_open()) {
+		throw(std::runtime_error("Failed to open the json file for reading"));
+	}
+	cardData << is;
+	is.close();
 }
 
 ExampleScene::~ExampleScene() {
@@ -59,36 +69,22 @@ void ExampleScene::FrameEnd() {
 }
 
 void ExampleScene::RenderFrame(SDL_Renderer* renderer) {
-	SDL_Color color = {255, 255, 255, 255};
-	SDL_Rect rect = {32, 32};
+	int line = 0;
+	for (auto& it : cardData) {
+		//render name
+		RenderText(renderer, it["name"], 32, 32 + 16 * line);
 
-	SDL_Surface* surface = TTF_RenderText_Solid(font, "Foobar", color);
+		//render mana (if applicable)
+		if (it["manaCost"].type() != nlohmann::json::value_t::null) {
+			RenderText(renderer, it["manaCost"], 300, 32 + 16 * line);
+		}
 
-	if (!surface) {
-		std::cerr << "Failed to create a TTF surface" << std::endl;
-		return;
+		//debug
+		if (line++ > 50) break;
 	}
-
-	SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
-
-	if (!texture) {
-		std::cerr << "Failed to create a TTF texture" << std::endl;
-		SDL_FreeSurface(surface);
-		return;
-	}
-
-	SDL_QueryTexture(texture, nullptr, nullptr, &rect.w, &rect.h);
-
-	if (SDL_RenderCopy(renderer, texture, nullptr, &rect)) {
-		std::cerr << "Failed to render a texture" << std::endl;
-	}
-
-	//cleanup
-	SDL_FreeSurface(surface);
-	SDL_DestroyTexture(texture);
 
 	//testing the mana display
-	manaIndex.at("G")->DrawTo(renderer, 32, 300, .2, .2);
+//	manaIndex.at("G")->DrawTo(renderer, 32, 300, .2, .2);
 }
 
 //-------------------------
@@ -202,4 +198,35 @@ void ExampleScene::DestroyIndex() {
 		delete it.second;
 	}
 	manaIndex.clear();
+}
+
+void ExampleScene::RenderText(SDL_Renderer* renderer, std::string text, int x, int y) {
+	//DOCS: quick and dirty
+	SDL_Color color = {255, 255, 255, 255}; //white
+	SDL_Rect rect = {x, y};
+
+	//make the surface
+	SDL_Surface* surface = TTF_RenderText_Solid(font, text.c_str(), color);
+	if (!surface) {
+		throw(std::runtime_error("Failed to create a TTF surface"));
+	}
+
+	//convert to texture
+	SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
+	if (!texture) {
+		SDL_FreeSurface(surface);
+		throw(std::runtime_error("Failed to create a TTF texture"));
+	}
+
+	//prevent warping
+	SDL_QueryTexture(texture, nullptr, nullptr, &rect.w, &rect.h);
+
+	//render
+	if (SDL_RenderCopy(renderer, texture, nullptr, &rect)) {
+		std::cerr << "Failed to render a texture" << std::endl;
+	}
+
+	//cleanup
+	SDL_FreeSurface(surface);
+	SDL_DestroyTexture(texture);
 }

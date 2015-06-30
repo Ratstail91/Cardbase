@@ -29,7 +29,7 @@
 
 //TODO: do something with these
 constexpr int screenWidth = 800;
-constexpr int screenHeight = 600;
+constexpr int screenHeight = 800;
 
 //DOCS: The Application class handles scene switching, utilizing only one window
 class Application {

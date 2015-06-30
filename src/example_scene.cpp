@@ -81,8 +81,16 @@ void ExampleScene::RenderFrame(SDL_Renderer* renderer) {
 		name = RenderText(renderer, it["name"]);
 
 		//render mana (if applicable)
-		if (it["manaCost"].type() != nlohmann::json::value_t::null) {
-			manaCost = RenderManaCost(renderer, it["manaCost"]);
+		try {
+			if (it["manaCost"].type() != nlohmann::json::value_t::null) {
+				manaCost = RenderManaCost(renderer, it["manaCost"]);
+			}
+		}
+		catch(std::exception& e) {
+			//find what cards break the system
+			std::ostringstream msg;
+			msg << e.what() << "; " << it["name"] << "; " << it["manaCost"];
+			throw(std::runtime_error(msg.str()));
 		}
 
 		//get the stats for name, then draw
@@ -147,6 +155,12 @@ void ExampleScene::KeyDown(SDL_KeyboardEvent const& event) {
 	switch(event.keysym.sym) {
 		case SDLK_ESCAPE:
 			QuitEvent();
+		break;
+		case SDLK_SPACE: {
+			nlohmann::json::iterator it = cardData.begin();
+			for (int i = 0; i < 40; i++) it++;
+			cardData.erase(cardData.begin(), it);
+		}
 		break;
 	}
 }
@@ -221,11 +235,17 @@ void ExampleScene::CreateIndex() {
 	PopulateIndex("2/G", SDL_Rect{105*4, 105*4, 100, 100});
 
 	//phyrexian mana
-	PopulateIndex("WP", SDL_Rect{105*5, 105*4, 100, 100});
-	PopulateIndex("UP", SDL_Rect{105*6, 105*4, 100, 100});
-	PopulateIndex("BP", SDL_Rect{105*7, 105*4, 100, 100});
-	PopulateIndex("RP", SDL_Rect{105*8, 105*4, 100, 100});
-	PopulateIndex("GP", SDL_Rect{105*9, 105*4, 100, 100});
+	PopulateIndex("W/P", SDL_Rect{105*5, 105*4, 100, 100});
+	PopulateIndex("U/P", SDL_Rect{105*6, 105*4, 100, 100});
+	PopulateIndex("B/P", SDL_Rect{105*7, 105*4, 100, 100});
+	PopulateIndex("R/P", SDL_Rect{105*8, 105*4, 100, 100});
+	PopulateIndex("G/P", SDL_Rect{105*9, 105*4, 100, 100});
+
+	//oddball mana
+	PopulateIndex("1000000", SDL_Rect{105*0, 105*6, 512, 100});
+	//100~
+	PopulateIndex("hw", SDL_Rect{831, 105*6, 50, 100});
+//	PopulateIndex("hr", SDL_Rect{886, 105*6, 50, 100});
 }
 
 void ExampleScene::DestroyIndex() {
@@ -260,6 +280,9 @@ SDL_Texture* ExampleScene::RenderText(SDL_Renderer* renderer, std::string text) 
 }
 
 SDL_Texture* ExampleScene::RenderManaCost(SDL_Renderer* renderer, std::string str) {
+	//handle oddball manacosts
+	bool oddball = false;
+
 	//hold the parsed codes in reverse order
 	std::stack<std::string> manaCodes;
 
@@ -286,6 +309,11 @@ SDL_Texture* ExampleScene::RenderManaCost(SDL_Renderer* renderer, std::string st
 
 		//push
 		manaCodes.emplace(code);
+
+		//Gleemax
+		if (!strcmp(code, "1000000")) {
+			oddball = true;
+		}
 	}
 
 	//make a new texture to return
@@ -293,7 +321,7 @@ SDL_Texture* ExampleScene::RenderManaCost(SDL_Renderer* renderer, std::string st
 		renderer,
 		SDL_PIXELFORMAT_RGBA8888,
 		SDL_TEXTUREACCESS_TARGET,
-		12 * manaCodes.size(), //use 12px sizes to match the text
+		oddball ? 512 : 12 * manaCodes.size(), //use 12px sizes to match the text, or 512 for oddball cards
 		12
 		);
 

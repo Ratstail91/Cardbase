@@ -25,7 +25,7 @@ OBJ+=$(addprefix $(OBJDIR)/,$(CXXSRC:.cpp=.o))
 
 #output
 OUTDIR=../out
-OUT=$(addprefix $(OUTDIR)/,cardbase)
+OUT=$(addprefix $(OUTDIR)/,Cardbase)
 
 #targets
 all: $(OBJ) $(OUT)

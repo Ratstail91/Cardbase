@@ -23,6 +23,8 @@
 
 #include "base_scene.hpp"
 
+#include "SDL2/SDL_ttf.h"
+
 class ExampleScene : public BaseScene {
 public:
 	ExampleScene();
@@ -43,4 +45,7 @@ private:
 	void MouseWheel(SDL_MouseWheelEvent const& event) override;
 	void KeyDown(SDL_KeyboardEvent const& event) override;
 	void KeyUp(SDL_KeyboardEvent const& event) override;
+
+	//
+	TTF_Font* font = nullptr;
 };

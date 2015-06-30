@@ -56,6 +56,13 @@ void Application::Init(int argc, char* argv[]) {
 
 	//set the hook for the renderer
 	BaseScene::SetRenderer(renderer);
+
+	//initialize fonts
+	if (TTF_Init()) {
+		std::ostringstream msg;
+		msg << "Failed to initialize fonts: " << SDL_GetError();
+		throw(std::runtime_error(msg.str()));
+	}
 }
 
 void Application::Proc() {
@@ -108,8 +115,7 @@ void Application::Quit() {
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 
-	//TODO: is this necessary?
-//	SDL_Quit();
+	TTF_Quit();
 }
 
 //-------------------------

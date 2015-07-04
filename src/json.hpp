@@ -120,7 +120,6 @@ template <
     >
 class basic_json
 {
-  public:
     /////////////////////
     // container types //
     /////////////////////
@@ -128,9 +127,12 @@ class basic_json
     /// @name container types
     /// @{
 
+  private:
+    /// workaround type for MSVC
     using __basic_json =
         basic_json<ObjectType, ArrayType, StringType, BooleanType, NumberIntegerType, NumberFloatType, AllocatorType>;
 
+  public:
     /// the type of elements in a basic_json container
     using value_type = basic_json;
 
@@ -201,15 +203,16 @@ class basic_json
     /// @}
 
 
-    /////////////////////////////////
-    // JSON value type enumeration //
-    /////////////////////////////////
+    ///////////////////////////
+    // JSON type enumeration //
+    ///////////////////////////
 
     /*!
-    @brief the JSON value type enumeration
+    @brief the JSON type enumeration
 
-    This enumeration collects the different JSON value types. It is used to
-    distinguish the stored values in the union @ref json_value.
+    This enumeration collects the different JSON types. It is internally used
+    to distinguish the stored values, and the functions is_null, is_object,
+    is_array, is_string, is_boolean, is_number, and is_discarded rely on it.
     */
     enum class value_t : uint8_t
     {
@@ -224,6 +227,7 @@ class basic_json
     };
 
 
+  private:
     ////////////////////////
     // JSON value storage //
     ////////////////////////
@@ -332,6 +336,8 @@ class basic_json
         }
     };
 
+
+  public:
     //////////////////////////
     // JSON parser callback //
     //////////////////////////
@@ -409,7 +415,7 @@ class basic_json
                                   int depth, parse_event_t event, basic_json& parsed)>;
 
     /*!
-    @brief comparison operator for JSON value types
+    @brief comparison operator for JSON types
 
     Returns an ordering that is similar to Python:
     - order: null < boolean < number < object < array < string
@@ -462,7 +468,7 @@ class basic_json
     @complexity Constant.
 
     @throw std::bad_alloc if allocation for object, array, or string value
-    fails (thrown by the constructors of @ref json_value)
+    fails
 
     @liveexample{The following code shows the constructor for different @ref
     value_t values,basic_json__value_t}
@@ -520,8 +526,7 @@ class basic_json
 
     @complexity Linear in the size of the passed @a value.
 
-    @throw std::bad_alloc if allocation for object value fails (thrown by
-    the constructor of @ref json_value)
+    @throw std::bad_alloc if allocation for object value fails
 
     @liveexample{The following code shows the constructor with an @ref object_t
     parameter.,basic_json__object_t}
@@ -546,8 +551,7 @@ class basic_json
 
     @complexity Linear in the size of the passed @a value.
 
-    @throw std::bad_alloc if allocation for object value fails (thrown by
-    the constructor of @ref json_value)
+    @throw std::bad_alloc if allocation for object value fails
 
     @liveexample{The following code shows the constructor with several
     compatible object type parameters.,basic_json__CompatibleObjectType}
@@ -578,8 +582,7 @@ class basic_json
 
     @complexity Linear in the size of the passed @a value.
 
-    @throw std::bad_alloc if allocation for array value fails (thrown by
-    the constructor of @ref json_value)
+    @throw std::bad_alloc if allocation for array value fails
 
     @liveexample{The following code shows the constructor with an @ref array_t
     parameter.,basic_json__array_t}
@@ -604,8 +607,7 @@ class basic_json
 
     @complexity Linear in the size of the passed @a value.
 
-    @throw std::bad_alloc if allocation for array value fails (thrown by
-    the constructor of @ref json_value)
+    @throw std::bad_alloc if allocation for array value fails
 
     @liveexample{The following code shows the constructor with several
     compatible array type parameters.,basic_json__CompatibleArrayType}
@@ -641,8 +643,7 @@ class basic_json
 
     @complexity Linear in the size of the passed @a value.
 
-    @throw std::bad_alloc if allocation for string value fails (thrown by
-    the constructor of @ref json_value)
+    @throw std::bad_alloc if allocation for string value fails
 
     @liveexample{The following code shows the constructor with an @ref string_t
     parameter.,basic_json__string_t}
@@ -663,8 +664,7 @@ class basic_json
 
     @complexity Linear in the size of the passed @a value.
 
-    @throw std::bad_alloc if allocation for string value fails (thrown by
-    the constructor of @ref json_value)
+    @throw std::bad_alloc if allocation for string value fails
 
     @liveexample{The following code shows the constructor with string literal
     parameter.,basic_json__string_t_value_type}
@@ -688,8 +688,7 @@ class basic_json
 
     @complexity Linear in the size of the passed @a value.
 
-    @throw std::bad_alloc if allocation for string value fails (thrown by
-    the constructor of @ref json_value)
+    @throw std::bad_alloc if allocation for string value fails
 
     @liveexample{The following code shows the construction of a string value
     from a compatible type.,basic_json__CompatibleStringType}
@@ -1093,12 +1092,12 @@ class basic_json
 
     Constructs the JSON value with the contents of the range `[first, last)`.
     The semantics depends on the different types a JSON value can have:
-    - In case of atomic value types (number, boolean, or string), @a first must
+    - In case of primitive types (number, boolean, or string), @a first must
       be `begin()` and @a last must be `end()`. In this case, the value is
       copied. Otherwise, std::out_of_range is thrown.
-    - In case of compound value types (array, object), the constructor behaves
+    - In case of structured types (array, object), the constructor behaves
       as similar versions for `std::vector`.
-    - In case of a null value type, std::domain_error is thrown.
+    - In case of a null type, std::domain_error is thrown.
 
     @tparam InputIT an input iterator type (@ref iterator or @ref
     const_iterator)
@@ -1108,7 +1107,7 @@ class basic_json
 
     @throw std::domain_error if iterators are not compatible; that is, do not
     belong to the same JSON value
-    @throw std::out_of_range if iterators are for an atomic value type (number,
+    @throw std::out_of_range if iterators are for a primitive type (number,
     boolean, or string) where an out of range error can be detected easily
     @throw std::bad_alloc if allocation for object, array, or string fails
     @throw std::domain_error if called with a null value
@@ -1132,7 +1131,7 @@ class basic_json
             throw std::domain_error("iterators are not compatible");
         }
 
-        // check if iterator range is complete for atomic values
+        // check if iterator range is complete for primitive values
         switch (m_type)
         {
             case value_t::number_integer:
@@ -1347,7 +1346,7 @@ class basic_json
 
     @ingroup container
     */
-    ~basic_json() noexcept
+    ~basic_json()
     {
         switch (m_type)
         {
@@ -1416,7 +1415,7 @@ class basic_json
 
     @see https://docs.python.org/2/library/json.html#json.dump
     */
-    string_t dump(const int indent = -1) const noexcept
+    string_t dump(const int indent = -1) const
     {
         std::stringstream ss;
 
@@ -1432,10 +1431,59 @@ class basic_json
         return ss.str();
     }
 
-    /// return the type of the object (explicit)
+    /*!
+    @brief return the type of the JSON value (explicit)
+
+    Return the type of the JSON value as a value from the @ref value_t
+    enumeration.
+
+    @return the type of the JSON value
+
+    @complexity Constant.
+
+    @liveexample{The following code exemplifies @ref type() for all JSON
+    types.,type}
+    */
     value_t type() const noexcept
     {
         return m_type;
+    }
+
+    /*!
+    @brief return whether type is primitive
+
+    This function returns true iff the JSON type is primitive (string, number,
+    boolean, or null).
+
+    @return `true` if type is primitive (string, number, boolean, or null),
+    `false` otherwise.
+
+    @complexity Constant.
+
+    @liveexample{The following code exemplifies @ref is_primitive for all JSON
+    types.,is_primitive}
+    */
+    bool is_primitive() const noexcept
+    {
+        return is_null() or is_string() or is_boolean() or is_number();
+    }
+
+    /*!
+    @brief return whether type is structured
+
+    This function returns true iff the JSON type is structured (array or
+    object).
+
+    @return `true` if type is structured (array or object), `false` otherwise.
+
+    @complexity Constant.
+
+    @liveexample{The following code exemplifies @ref is_structured for all JSON
+    types.,is_structured}
+    */
+    bool is_structured() const noexcept
+    {
+        return is_array() or is_object();
     }
 
     /*!
@@ -1443,12 +1491,12 @@ class basic_json
 
     This function returns true iff the JSON value is null.
 
-    @return `true` if value type is null, `false` otherwise.
+    @return `true` if type is null, `false` otherwise.
 
     @complexity Constant.
 
     @liveexample{The following code exemplifies @ref is_null for all JSON
-    value types.,is_null}
+    types.,is_null}
     */
     bool is_null() const noexcept
     {
@@ -1460,12 +1508,12 @@ class basic_json
 
     This function returns true iff the JSON value is a boolean.
 
-    @return `true` if value type is boolean, `false` otherwise.
+    @return `true` if type is boolean, `false` otherwise.
 
     @complexity Constant.
 
     @liveexample{The following code exemplifies @ref is_boolean for all JSON
-    value types.,is_boolean}
+    types.,is_boolean}
     */
     bool is_boolean() const noexcept
     {
@@ -1478,16 +1526,16 @@ class basic_json
     This function returns true iff the JSON value is a number. This includes
     both integer and floating-point values.
 
-    @return `true` if value type is number, `false` otherwise.
+    @return `true` if type is number, `false` otherwise.
 
     @complexity Constant.
 
     @liveexample{The following code exemplifies @ref is_number for all JSON
-    value types.,is_number}
+    types.,is_number}
     */
     bool is_number() const noexcept
     {
-        return (m_type == value_t::number_integer) or (m_type == value_t::number_float);
+        return is_number_integer() or is_number_float();
     }
 
     /*!
@@ -1496,12 +1544,12 @@ class basic_json
     This function returns true iff the JSON value is an integer number. This
     excludes floating-point values.
 
-    @return `true` if value type is an integer number, `false` otherwise.
+    @return `true` if type is an integer number, `false` otherwise.
 
     @complexity Constant.
 
     @liveexample{The following code exemplifies @ref is_number_integer for all
-    JSON value types.,is_number_integer}
+    JSON types.,is_number_integer}
     */
     bool is_number_integer() const noexcept
     {
@@ -1514,12 +1562,12 @@ class basic_json
     This function returns true iff the JSON value is a floating-point number.
     This excludes integer values.
 
-    @return `true` if value type is a floating-point number, `false` otherwise.
+    @return `true` if type is a floating-point number, `false` otherwise.
 
     @complexity Constant.
 
     @liveexample{The following code exemplifies @ref is_number_float for all
-    JSON value types.,is_number_float}
+    JSON types.,is_number_float}
     */
     bool is_number_float() const noexcept
     {
@@ -1531,12 +1579,12 @@ class basic_json
 
     This function returns true iff the JSON value is an object.
 
-    @return `true` if value type is object, `false` otherwise.
+    @return `true` if type is object, `false` otherwise.
 
     @complexity Constant.
 
     @liveexample{The following code exemplifies @ref is_object for all JSON
-    value types.,is_object}
+    types.,is_object}
     */
     bool is_object() const noexcept
     {
@@ -1548,12 +1596,12 @@ class basic_json
 
     This function returns true iff the JSON value is an array.
 
-    @return `true` if value type is array, `false` otherwise.
+    @return `true` if type is array, `false` otherwise.
 
     @complexity Constant.
 
     @liveexample{The following code exemplifies @ref is_array for all JSON
-    value types.,is_array}
+    types.,is_array}
     */
     bool is_array() const noexcept
     {
@@ -1565,25 +1613,48 @@ class basic_json
 
     This function returns true iff the JSON value is a string.
 
-    @return `true` if value type is string, `false` otherwise.
+    @return `true` if type is string, `false` otherwise.
 
     @complexity Constant.
 
     @liveexample{The following code exemplifies @ref is_string for all JSON
-    value types.,is_string}
+    types.,is_string}
     */
     bool is_string() const noexcept
     {
         return m_type == value_t::string;
     }
 
-    // return whether value is discarded
+    /*!
+    @brief return whether value is discarded
+
+    This function returns true iff the JSON value was discarded during parsing
+    with a callback function (see @ref parser_callback_t).
+
+    @return `true` if type is discarded, `false` otherwise.
+
+    @complexity Constant.
+
+    @todo Add example.
+    */
     bool is_discarded() const noexcept
     {
         return m_type == value_t::discarded;
     }
 
-    /// return the type of the object (implicit)
+    /*!
+    @brief return the type of the JSON value (implicit)
+
+    Implicitly return the type of the JSON value as a value from the @ref
+    value_t enumeration.
+
+    @return the type of the JSON value
+
+    @complexity Constant.
+
+    @liveexample{The following code exemplifies the value_t operator for all
+    JSON types.,operator__value_t}
+    */
     operator value_t() const noexcept
     {
         return m_type;
@@ -1612,7 +1683,7 @@ class basic_json
             }
             default:
             {
-                throw std::domain_error("value type must be object, but is " + type_name());
+                throw std::domain_error("type must be object, but is " + type_name());
             }
         }
     }
@@ -1628,7 +1699,7 @@ class basic_json
             }
             default:
             {
-                throw std::domain_error("value type must be object, but is " + type_name());
+                throw std::domain_error("type must be object, but is " + type_name());
             }
         }
     }
@@ -1658,7 +1729,7 @@ class basic_json
             }
             default:
             {
-                throw std::domain_error("value type must be array, but is " + type_name());
+                throw std::domain_error("type must be array, but is " + type_name());
             }
         }
     }
@@ -1686,7 +1757,7 @@ class basic_json
             }
             default:
             {
-                throw std::domain_error("value type must be array, but is " + type_name());
+                throw std::domain_error("type must be array, but is " + type_name());
             }
         }
     }
@@ -1707,11 +1778,12 @@ class basic_json
             }
             default:
             {
-                throw std::domain_error("value type must be array, but is " + type_name());
+                throw std::domain_error("type must be array, but is " + type_name());
             }
         }
     }
 
+    /// get an array (explicit)
     array_t get_impl(array_t*) const
     {
         switch (m_type)
@@ -1722,7 +1794,7 @@ class basic_json
             }
             default:
             {
-                throw std::domain_error("value type must be array, but is " + type_name());
+                throw std::domain_error("type must be array, but is " + type_name());
             }
         }
     }
@@ -1742,7 +1814,7 @@ class basic_json
             }
             default:
             {
-                throw std::domain_error("value type must be string, but is " + type_name());
+                throw std::domain_error("type must be string, but is " + type_name());
             }
         }
     }
@@ -1766,7 +1838,7 @@ class basic_json
             }
             default:
             {
-                throw std::domain_error("value type must be number, but is " + type_name());
+                throw std::domain_error("type must be number, but is " + type_name());
             }
         }
     }
@@ -1782,9 +1854,81 @@ class basic_json
             }
             default:
             {
-                throw std::domain_error("value type must be boolean, but is " + type_name());
+                throw std::domain_error("type must be boolean, but is " + type_name());
             }
         }
+    }
+
+    /// get a pointer to the value (object)
+    object_t* get_impl_ptr(object_t*) noexcept
+    {
+        return is_object() ? m_value.object : nullptr;
+    }
+
+    /// get a pointer to the value (object)
+    const object_t* get_impl_ptr(const object_t*) const noexcept
+    {
+        return is_object() ? m_value.object : nullptr;
+    }
+
+    /// get a pointer to the value (array)
+    array_t* get_impl_ptr(array_t*) noexcept
+    {
+        return is_array() ? m_value.array : nullptr;
+    }
+
+    /// get a pointer to the value (array)
+    const array_t* get_impl_ptr(const array_t*) const noexcept
+    {
+        return is_array() ? m_value.array : nullptr;
+    }
+
+    /// get a pointer to the value (string)
+    string_t* get_impl_ptr(string_t*) noexcept
+    {
+        return is_string() ? m_value.string : nullptr;
+    }
+
+    /// get a pointer to the value (string)
+    const string_t* get_impl_ptr(const string_t*) const noexcept
+    {
+        return is_string() ? m_value.string : nullptr;
+    }
+
+    /// get a pointer to the value (boolean)
+    boolean_t* get_impl_ptr(boolean_t*) noexcept
+    {
+        return is_boolean() ? &m_value.boolean : nullptr;
+    }
+
+    /// get a pointer to the value (boolean)
+    const boolean_t* get_impl_ptr(const boolean_t*) const noexcept
+    {
+        return is_boolean() ? &m_value.boolean : nullptr;
+    }
+
+    /// get a pointer to the value (integer number)
+    number_integer_t* get_impl_ptr(number_integer_t*) noexcept
+    {
+        return is_number_integer() ? &m_value.number_integer : nullptr;
+    }
+
+    /// get a pointer to the value (integer number)
+    const number_integer_t* get_impl_ptr(const number_integer_t*) const noexcept
+    {
+        return is_number_integer() ? &m_value.number_integer : nullptr;
+    }
+
+    /// get a pointer to the value (floating-point number)
+    number_float_t* get_impl_ptr(number_float_t*) noexcept
+    {
+        return is_number_float() ? &m_value.number_float : nullptr;
+    }
+
+    /// get a pointer to the value (floating-point number)
+    const number_float_t* get_impl_ptr(const number_float_t*) const noexcept
+    {
+        return is_number_float() ? &m_value.number_float : nullptr;
     }
 
   public:
@@ -1792,19 +1936,175 @@ class basic_json
     /// @name value access
     /// @{
 
-    /// get a value (explicit)
-    // <http://stackoverflow.com/a/8315197/266378>
-    template<typename T>
-    T get() const
+    /*!
+    @brief get a value (explicit)
+
+    Explicit type conversion between the JSON value and a compatible value.
+
+    @tparam ValueType non-pointer type compatible to the JSON value, for
+    instance `int` for JSON integer numbers, `bool` for JSON booleans, or
+    `std::vector` types for JSON arrays
+
+    @return copy of the JSON value, converted to type @a ValueType
+
+    @throw std::domain_error in case passed type @a ValueType is incompatible
+    to JSON
+
+    @complexity Linear in the size of the JSON value.
+
+    @liveexample{The example below shows serveral conversions from JSON values
+    to other types. There a few things to note: (1) Floating-point numbers can
+    be converted to integers\, (2) A JSON array can be converted to a standard
+    `std::vector<short>`\, (3) A JSON object can be converted to C++
+    assiciative containers such as `std::unordered_map<std::string\,
+    json>`.,get__ValueType_const}
+
+    @internal
+    The idea of using a casted null pointer to choose the correct
+    implementation is from <http://stackoverflow.com/a/8315197/266378>.
+    @endinternal
+
+    @sa @ref operator ValueType() const for implicit conversion
+    @sa @ref get() for pointer-member access
+    */
+    template<typename ValueType, typename
+             std::enable_if<
+                 not std::is_pointer<ValueType>::value
+                 , int>::type = 0>
+    ValueType get() const
     {
-        return get_impl(static_cast<T*>(nullptr));
+        return get_impl(static_cast<ValueType*>(nullptr));
     }
 
-    /// get a value (implicit)
-    template<typename T>
-    operator T() const
+    /*!
+    @brief get a pointer value (explicit)
+
+    Explicit pointer access to the internally stored JSON value. No copies are
+    made.
+
+    @warning Writing data to the pointee of the result yields an undefined
+    state.
+
+    @tparam PointerType pointer type; must be a pointer to @ref array_t, @ref
+    object_t, @ref string_t, @ref boolean_t, @ref number_integer_t, or @ref
+    number_float_t.
+
+    @return pointer to the internally stored JSON value if the requested pointer
+    type @a PointerType fits to the JSON value; `nullptr` otherwise
+
+    @complexity Constant.
+
+    @liveexample{The example below shows how pointers to internal values of a
+    JSON value can be requested. Note that no type conversions are made and a
+    `nullptr` is returned if the value and the requested pointer type does not
+    match.,get__PointerType}
+
+    @sa @ref get_ptr() for explicit pointer-member access
+    */
+    template<typename PointerType, typename
+             std::enable_if<
+                 std::is_pointer<PointerType>::value
+                 , int>::type = 0>
+    PointerType get() noexcept
     {
-        return get<T>();
+        // delegate the call to get_ptr
+        return get_ptr<PointerType>();
+    }
+
+    /*!
+    @brief get a pointer value (explicit)
+    @copydoc get()
+    */
+    template<typename PointerType, typename
+             std::enable_if<
+                 std::is_pointer<PointerType>::value
+                 , int>::type = 0>
+    const PointerType get() const noexcept
+    {
+        // delegate the call to get_ptr
+        return get_ptr<PointerType>();
+    }
+
+    /*!
+    @brief get a pointer value (implicit)
+
+    Implict pointer access to the internally stored JSON value. No copies are
+    made.
+
+    @warning Writing data to the pointee of the result yields an undefined
+    state.
+
+    @tparam PointerType pointer type; must be a pointer to @ref array_t, @ref
+    object_t, @ref string_t, @ref boolean_t, @ref number_integer_t, or @ref
+    number_float_t.
+
+    @return pointer to the internally stored JSON value if the requested pointer
+    type @a PointerType fits to the JSON value; `nullptr` otherwise
+
+    @complexity Constant.
+
+    @liveexample{The example below shows how pointers to internal values of a
+    JSON value can be requested. Note that no type conversions are made and a
+    `nullptr` is returned if the value and the requested pointer type does not
+    match.,get_ptr}
+    */
+    template<typename PointerType, typename
+             std::enable_if<
+                 std::is_pointer<PointerType>::value
+                 , int>::type = 0>
+    PointerType get_ptr() noexcept
+    {
+        // delegate the call to get_impl_ptr<>()
+        return get_impl_ptr(static_cast<PointerType>(nullptr));
+    }
+
+    /*!
+    @brief get a pointer value (implicit)
+    @copydoc get_ptr()
+    */
+    template<typename PointerType, typename
+             std::enable_if<
+                 std::is_pointer<PointerType>::value
+                 and std::is_const<PointerType>::value
+                 , int>::type = 0>
+    const PointerType get_ptr() const noexcept
+    {
+        // delegate the call to get_impl_ptr<>() const
+        return get_impl_ptr(static_cast<const PointerType>(nullptr));
+    }
+
+    /*!
+    @brief get a value (implicit)
+
+    Implict type conversion between the JSON value and a compatible value. The
+    call is realized by calling @ref get() const.
+
+    @tparam ValueType non-pointer type compatible to the JSON value, for
+    instance `int` for JSON integer numbers, `bool` for JSON booleans, or
+    `std::vector` types for JSON arrays
+
+    @return copy of the JSON value, converted to type @a ValueType
+
+    @throw std::domain_error in case passed type @a ValueType is incompatible
+    to JSON, thrown by @ref get() const
+
+    @complexity Linear in the size of the JSON value.
+
+    @liveexample{The example below shows serveral conversions from JSON values
+    to other types. There a few things to note: (1) Floating-point numbers can
+    be converted to integers\, (2) A JSON array can be converted to a standard
+    `std::vector<short>`\, (3) A JSON object can be converted to C++
+    assiciative containers such as `std::unordered_map<std::string\,
+    json>`.,operator__ValueType}
+    */
+    template<typename ValueType, typename
+             std::enable_if<
+                 not std::is_pointer<ValueType>::value
+                 , int>::type = 0>
+    operator ValueType() const
+    {
+        // delegate the call to get<>() const
+        return get<ValueType>();
     }
 
     /// @}
@@ -2011,7 +2311,26 @@ class basic_json
         return m_value.array->operator[](idx);
     }
 
-    /// access specified element
+    /*!
+    @brief access specified object element
+
+    Returns a reference to the element at with specified key @a key.
+
+    @note If @a key is not found in the object, then it is silently added to
+    the object and filled with a `null` value to make `key` a valid reference.
+    In case the value was `null` before, it is converted to an object.
+
+    @param[in] key  key of the element to access
+
+    @return reference to the element at key @a key
+
+    @throw std::domain_error if JSON is not an object or null
+
+    @complexity Logarithmic in the size of the container.
+
+    @liveexample{The example below shows how object elements can be read and
+    written using the [] operator.,operatorarray__key_type}
+    */
     reference operator[](const typename object_t::key_type& key)
     {
         // implicitly convert null to object
@@ -2032,7 +2351,22 @@ class basic_json
         return m_value.object->operator[](key);
     }
 
-    /// access specified element
+    /*!
+    @brief access specified object element
+
+    Returns a reference to the element at with specified key @a key.
+
+    @param[in] key  key of the element to access
+
+    @return reference to the element at key @a key
+
+    @throw std::domain_error if JSON is not an object or null
+
+    @complexity Logarithmic in the size of the container.
+
+    @liveexample{The example below shows how object elements can be read using
+    the [] operator.,operatorarray__key_type_const}
+    */
     const_reference operator[](const typename object_t::key_type& key) const
     {
         // at only works for objects
@@ -2044,7 +2378,28 @@ class basic_json
         return m_value.object->operator[](key);
     }
 
-    /// access specified element (needed for clang)
+    /*!
+    @brief access specified object element
+
+    Returns a reference to the element at with specified key @a key.
+
+    @note If @a key is not found in the object, then it is silently added to
+    the object and filled with a `null` value to make `key` a valid reference.
+    In case the value was `null` before, it is converted to an object.
+
+    @note This function is required for compatibility reasons with Clang.
+
+    @param[in] key  key of the element to access
+
+    @return reference to the element at key @a key
+
+    @throw std::domain_error if JSON is not an object or null
+
+    @complexity Logarithmic in the size of the container.
+
+    @liveexample{The example below shows how object elements can be read and
+    written using the [] operator.,operatorarray__key_type}
+    */
     template<typename T, std::size_t n>
     reference operator[](const T (&key)[n])
     {
@@ -2064,7 +2419,24 @@ class basic_json
         return m_value.object->operator[](key);
     }
 
-    /// access specified element (needed for clang)
+    /*!
+    @brief access specified object element
+
+    Returns a reference to the element at with specified key @a key.
+
+    @note This function is required for compatibility reasons with Clang.
+
+    @param[in] key  key of the element to access
+
+    @return reference to the element at key @a key
+
+    @throw std::domain_error if JSON is not an object or null
+
+    @complexity Logarithmic in the size of the container.
+
+    @liveexample{The example below shows how object elements can be read using
+    the [] operator.,operatorarray__key_type_const}
+    */
     template<typename T, std::size_t n>
     const_reference operator[](const T (&key)[n]) const
     {
@@ -2083,7 +2455,7 @@ class basic_json
     Returns a reference to the first element in the container. For a JSON
     container `c`, the expression `c.front()` is equivalent to `*c.begin()`.
 
-    @return In case of a compound value (array or object), a reference to the
+    @return In case of a structured type (array or object), a reference to the
     first element is returned. In cast of number, string, or boolean values, a
     reference to the value is returned.
 
@@ -2115,7 +2487,7 @@ class basic_json
     container `c`, the expression `c.back()` is equivalent to `{ auto tmp =
     c.end(); --tmp; return *tmp; }`.
 
-    @return In case of a compound value (array or object), a reference to the
+    @return In case of a structured type (array or object), a reference to the
     last element is returned. In cast of number, string, or boolean values, a
     reference to the value is returned.
 
@@ -2144,22 +2516,54 @@ class basic_json
         return *tmp;
     }
 
-    /// remove element given an iterator
-    template <class T, typename
+    /*!
+    @brief remove element given an iterator
+
+    Removes the element specified by iterator @a pos. Invalidates iterators and
+    references at or after the point of the erase, including the end()
+    iterator. The iterator @a pos must be valid and dereferenceable. Thus the
+    end() iterator (which is valid, but is not dereferencable) cannot be used
+    as a value for @a pos.
+
+    If called on a primitive type other than null, the resulting JSON value
+    will be `null`.
+
+    @param[in] pos iterator to the element to remove
+    @return Iterator following the last removed element. If the iterator @a pos
+    refers to the last element, the end() iterator is returned.
+
+    @tparam InteratorType an @ref iterator or @ref const_iterator
+
+    @throw std::domain_error if called on a `null` value
+    @throw std::domain_error if called on an iterator which does not belong to
+    the current JSON value
+    @throw std::out_of_range if called on a primitive type with invalid iterator
+    (i.e., any iterator which is not end())
+
+    @complexity The complexity depends on the type:
+    - objects: amortized constant
+    - arrays: linear in distance between pos and the end of the container
+    - strings: linear in the length of the string
+    - other types: constant
+
+    @liveexample{The example shows the result of erase for different JSON
+    types.,erase__IteratorType}
+    */
+    template <class InteratorType, typename
               std::enable_if<
-                  std::is_same<T, typename __basic_json::iterator>::value or
-                  std::is_same<T, typename __basic_json::const_iterator>::value
+                  std::is_same<InteratorType, typename __basic_json::iterator>::value or
+                  std::is_same<InteratorType, typename __basic_json::const_iterator>::value
                   , int>::type
               = 0>
-    T erase(T pos)
+    InteratorType erase(InteratorType pos)
     {
         // make sure iterator fits the current value
-        if (this != pos.m_object or m_type != pos.m_object->m_type)
+        if (this != pos.m_object)
         {
             throw std::domain_error("iterator does not fit current value");
         }
 
-        T result = end();
+        InteratorType result = end();
 
         switch (m_type)
         {
@@ -2204,23 +2608,55 @@ class basic_json
         return result;
     }
 
-    /// remove elements given an iterator range
-    template <class T, typename
+    /*!
+    @brief remove elements given an iterator range
+
+    Removes the element specified by the range `[first; last)`. Invalidates
+    iterators and references at or after the point of the erase, including the
+    end() iterator. The iterator @a first does not need to be dereferenceable
+    if `first == last`: erasing an empty range is a no-op.
+
+    If called on a primitive type other than null, the resulting JSON value
+    will be `null`.
+
+    @param[in] first iterator to the beginning of the range to remove
+    @param[in] last iterator past the end of the range to remove
+    @return Iterator following the last removed element. If the iterator @a
+    second refers to the last element, the end() iterator is returned.
+
+    @tparam InteratorType an @ref iterator or @ref const_iterator
+
+    @throw std::domain_error if called on a `null` value
+    @throw std::domain_error if called on iterators which does not belong to
+    the current JSON value
+    @throw std::out_of_range if called on a primitive type with invalid iterators
+    (i.e., if `first != begin()` and `last != end()`)
+
+    @complexity The complexity depends on the type:
+    - objects: `log(size()) + std::distance(first, last)`
+    - arrays: linear in the distance between @a first and @a last, plus linear
+      in the distance between @a last and end of the container
+    - strings: linear in the length of the string
+    - other types: constant
+
+    @liveexample{The example shows the result of erase for different JSON
+    types.,erase__IteratorType_IteratorType}
+    */
+    template <class InteratorType, typename
               std::enable_if<
-                  std::is_same<T, typename basic_json::iterator>::value or
-                  std::is_same<T, typename basic_json::const_iterator>::value
+                  std::is_same<InteratorType, typename basic_json::iterator>::value or
+                  std::is_same<InteratorType, typename basic_json::const_iterator>::value
                   , int>::type
               = 0>
-    T erase(T first, T last)
+    InteratorType erase(InteratorType first, InteratorType last)
     {
         // make sure iterator fits the current value
-        if (this != first.m_object or this != last.m_object or
-                m_type != first.m_object->m_type or m_type != last.m_object->m_type)
+        if (this != first.m_object or this != last.m_object)
         {
             throw std::domain_error("iterators do not fit current value");
         }
 
-        T result = end();
+        InteratorType result = end();
 
         switch (m_type)
         {
@@ -2267,7 +2703,23 @@ class basic_json
         return result;
     }
 
-    /// remove element from an object given a key
+    /*!
+    @brief remove element from a JSON object given a key
+
+    Removes elements from a JSON object with the key value @a key.
+
+    @param[in] key value of the elements to remove
+
+    @return Number of elements removed. If ObjectType is the default `std::map`
+    type, the return value will always be `0` (@a key was not found) or `1` (@a
+    key was found).
+
+    @throw std::domain_error when called on a type other than JSON object
+
+    @complexity `log(size()) + count(key)`
+
+    @liveexample{The example shows the effect of erase.,erase__key_type}
+    */
     size_type erase(const typename object_t::key_type& key)
     {
         // this erase only works for objects
@@ -2279,7 +2731,20 @@ class basic_json
         return m_value.object->erase(key);
     }
 
-    /// remove element from an array given an index
+    /*!
+    @brief remove element from a JSON array given an index
+
+    Removes element from a JSON array at the index @a idx.
+
+    @param[in] idx index of the element to remove
+
+    @throw std::domain_error when called on a type other than JSON array
+    @throw std::out_of_range when `idx >= size()`
+
+    @complexity Linear in distance between @a idx and the end of the container.
+
+    @liveexample{The example shows the effect of erase.,erase__size_type}
+    */
     void erase(const size_type idx)
     {
         // this erase only works for arrays
@@ -2296,7 +2761,21 @@ class basic_json
         m_value.array->erase(m_value.array->begin() + static_cast<difference_type>(idx));
     }
 
-    /// find an element in an object
+    /*!
+    @brief find an element in a JSON object
+
+    Finds an element in a JSON object with key equivalent to @a key. If the
+    element is not found or the JSON value is not an object, end() is returned.
+
+    @param[in] key key value of the element to search for
+
+    @return Iterator to an element with key equivalent to @a key. If no such
+    element is found, past-the-end (see end()) iterator is returned.
+
+    @complexity Logarithmic in the size of the JSON object.
+
+    @liveexample{The example shows how find is used.,find__key_type}
+    */
     iterator find(typename object_t::key_type key)
     {
         auto result = end();
@@ -2309,7 +2788,10 @@ class basic_json
         return result;
     }
 
-    /// find an element in an object
+    /*!
+    @brief find an element in a JSON object
+    @copydoc find(typename object_t::key_type)
+    */
     const_iterator find(typename object_t::key_type key) const
     {
         auto result = cend();
@@ -2322,7 +2804,22 @@ class basic_json
         return result;
     }
 
-    /// returns the number of occurrences of a key in an object
+    /*!
+    @brief returns the number of occurrences of a key in a JSON object
+
+    Returns the number of elements with key @a key. If ObjectType is the
+    default `std::map` type, the return value will always be `0` (@a key was
+    not found) or `1` (@a key was found).
+
+    @param[in] key key value of the element to count
+
+    @return Number of elements with key @a key. If the JSON value is not an
+    object, the return value will be `0`.
+
+    @complexity Logarithmic in the size of the JSON object.
+
+    @liveexample{The example shows how count is used.,count}
+    */
     size_type count(typename object_t::key_type key) const
     {
         // return 0 for all nonobject types
@@ -2357,7 +2854,7 @@ class basic_json
 
     @ingroup container
     */
-    iterator begin() noexcept
+    iterator begin()
     {
         iterator result(this);
         result.set_begin();
@@ -2368,7 +2865,7 @@ class basic_json
     @copydoc basic_json::cbegin()
     @ingroup container
     */
-    const_iterator begin() const noexcept
+    const_iterator begin() const
     {
         return cbegin();
     }
@@ -2392,7 +2889,7 @@ class basic_json
 
     @ingroup container
     */
-    const_iterator cbegin() const noexcept
+    const_iterator cbegin() const
     {
         const_iterator result(this);
         result.set_begin();
@@ -2417,7 +2914,7 @@ class basic_json
 
     @ingroup container
     */
-    iterator end() noexcept
+    iterator end()
     {
         iterator result(this);
         result.set_end();
@@ -2428,7 +2925,7 @@ class basic_json
     @copydoc basic_json::cend()
     @ingroup container
     */
-    const_iterator end() const noexcept
+    const_iterator end() const
     {
         return cend();
     }
@@ -2452,7 +2949,7 @@ class basic_json
 
     @ingroup container
     */
-    const_iterator cend() const noexcept
+    const_iterator cend() const
     {
         const_iterator result(this);
         result.set_end();
@@ -2476,7 +2973,7 @@ class basic_json
 
     @ingroup reversiblecontainer
     */
-    reverse_iterator rbegin() noexcept
+    reverse_iterator rbegin()
     {
         return reverse_iterator(end());
     }
@@ -2485,7 +2982,7 @@ class basic_json
     @copydoc basic_json::crbegin()
     @ingroup reversiblecontainer
     */
-    const_reverse_iterator rbegin() const noexcept
+    const_reverse_iterator rbegin() const
     {
         return crbegin();
     }
@@ -2508,7 +3005,7 @@ class basic_json
 
     @ingroup reversiblecontainer
     */
-    reverse_iterator rend() noexcept
+    reverse_iterator rend()
     {
         return reverse_iterator(begin());
     }
@@ -2517,7 +3014,7 @@ class basic_json
     @copydoc basic_json::crend()
     @ingroup reversiblecontainer
     */
-    const_reverse_iterator rend() const noexcept
+    const_reverse_iterator rend() const
     {
         return crend();
     }
@@ -2540,7 +3037,7 @@ class basic_json
 
     @ingroup reversiblecontainer
     */
-    const_reverse_iterator crbegin() const noexcept
+    const_reverse_iterator crbegin() const
     {
         return const_reverse_iterator(cend());
     }
@@ -2563,7 +3060,7 @@ class basic_json
 
     @ingroup reversiblecontainer
     */
-    const_reverse_iterator crend() const noexcept
+    const_reverse_iterator crend() const
     {
         return const_reverse_iterator(cbegin());
     }
@@ -2583,7 +3080,7 @@ class basic_json
 
     Checks if a JSON value has no elements.
 
-    @return The return value depends on the different value types and is
+    @return The return value depends on the different types and is
             defined as follows:
             Value type  | return value
             ----------- | -------------
@@ -2639,7 +3136,7 @@ class basic_json
 
     Returns the number of elements in a JSON value.
 
-    @return The return value depends on the different value types and is
+    @return The return value depends on the different types and is
             defined as follows:
             Value type  | return value
             ----------- | -------------
@@ -2697,7 +3194,7 @@ class basic_json
     system or library implementation limitations, i.e. `std::distance(begin(),
     end())` for the JSON value.
 
-    @return The return value depends on the different value types and is
+    @return The return value depends on the different types and is
             defined as follows:
             Value type  | return value
             ----------- | -------------
@@ -2780,7 +3277,7 @@ class basic_json
     @complexity Linear in the size of the JSON value.
 
     @liveexample{The example below shows the effect of @ref clear to different
-    JSON value types.,clear}
+    JSON types.,clear}
     */
     void clear() noexcept
     {
@@ -3368,7 +3865,7 @@ class basic_json
     ///////////////////////////
 
     /// return the type as string
-    string_t type_name() const noexcept
+    string_t type_name() const
     {
         switch (m_type)
         {
@@ -3420,7 +3917,7 @@ class basic_json
     @param[out] o  the stream to write the escaped string to
     @param[in] s  the string to escape
     */
-    static void escape_string(std::ostream& o, const string_t& s) noexcept
+    static void escape_string(std::ostream& o, const string_t& s)
     {
         for (const auto c : s)
         {
@@ -3481,7 +3978,7 @@ class basic_json
                     {
                         // control characters (everything between 0x00 and 0x1f)
                         // -> create four-digit hex representation
-                        o << "\\u" << std::hex << std::setw(4) << std::setfill('0') << int(c);
+                        o << "\\u" << std::hex << std::setw(4) << std::setfill('0') << int(c) << std::dec;
                     }
                     else
                     {
@@ -3512,7 +4009,7 @@ class basic_json
     @param[in] current_indent  the current indent level (only used internally)
     */
     void dump(std::ostream& o, const bool pretty_print, const unsigned int indent_step,
-              const unsigned int current_indent = 0) const noexcept
+              const unsigned int current_indent = 0) const
     {
         // variable to hold indentation for recursive calls
         unsigned int new_indent = current_indent;
@@ -3672,7 +4169,7 @@ class basic_json
         typename object_t::iterator object_iterator;
         /// iterator for JSON arrays
         typename array_t::iterator array_iterator;
-        /// generic iterator for all other value types
+        /// generic iterator for all other types
         difference_type generic_iterator;
 
         /// default constructor
@@ -3702,7 +4199,7 @@ class basic_json
         iterator() = default;
 
         /// constructor for a given JSON instance
-        iterator(pointer object) noexcept : m_object(object)
+        iterator(pointer object) : m_object(object)
         {
             switch (m_object->m_type)
             {
@@ -3744,7 +4241,7 @@ class basic_json
 
       private:
         /// set the iterator to the first value
-        void set_begin() noexcept
+        void set_begin()
         {
             switch (m_object->m_type)
             {
@@ -3776,7 +4273,7 @@ class basic_json
         }
 
         /// set the iterator past the last value
-        void set_end() noexcept
+        void set_end()
         {
             switch (m_object->m_type)
             {
@@ -4218,7 +4715,7 @@ class basic_json
         const_iterator() = default;
 
         /// constructor for a given JSON instance
-        const_iterator(pointer object) noexcept : m_object(object)
+        const_iterator(pointer object) : m_object(object)
         {
             switch (m_object->m_type)
             {
@@ -4241,7 +4738,7 @@ class basic_json
         }
 
         /// copy constructor given a nonconst iterator
-        const_iterator(const iterator& other) noexcept : m_object(other.m_object)
+        const_iterator(const iterator& other) : m_object(other.m_object)
         {
             switch (m_object->m_type)
             {
@@ -4285,7 +4782,7 @@ class basic_json
 
       private:
         /// set the iterator to the first value
-        void set_begin() noexcept
+        void set_begin()
         {
             switch (m_object->m_type)
             {
@@ -4317,7 +4814,7 @@ class basic_json
         }
 
         /// set the iterator past the last value
-        void set_end() noexcept
+        void set_end()
         {
             switch (m_object->m_type)
             {
@@ -4773,14 +5270,14 @@ class basic_json
         using lexer_char_t = unsigned char;
 
         /// constructor with a given buffer
-        lexer(const string_t& s) noexcept
+        explicit lexer(const string_t& s) noexcept
             : m_stream(nullptr), m_buffer(s)
         {
             m_content = reinterpret_cast<const lexer_char_t*>(s.c_str());
             m_start = m_cursor = m_content;
             m_limit = m_content + s.size();
         }
-        lexer(std::istream* s) noexcept
+        explicit lexer(std::istream* s) noexcept
             : m_stream(s), m_buffer()
         {
             getline(*m_stream, m_buffer);
@@ -4872,7 +5369,7 @@ class basic_json
         }
 
         /// return name of values of type token_type
-        static std::string token_type_name(token_type t) noexcept
+        static std::string token_type_name(token_type t)
         {
             switch (t)
             {
@@ -5889,15 +6386,16 @@ basic_json_parser_59:
     {
       public:
         /// constructor for strings
-        parser(const string_t& s, parser_callback_t cb = nullptr) : callback(cb), m_lexer(s)
+        parser(const string_t& s, parser_callback_t cb = nullptr)
+            : callback(cb), m_lexer(s)
         {
             // read first token
             get_token();
         }
 
         /// a parser reading from an input stream
-        parser(std::istream& _is, parser_callback_t cb = nullptr) : callback(cb),
-            m_lexer(&_is)
+        parser(std::istream& _is, parser_callback_t cb = nullptr)
+            : callback(cb), m_lexer(&_is)
         {
             // read first token
             get_token();
@@ -6164,7 +6662,7 @@ basic_json_parser_59:
         }
 
       private:
-        /// levels of recursion
+        /// current level of recursion
         int depth = 0;
         /// callback function
         parser_callback_t callback;

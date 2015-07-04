@@ -46,6 +46,9 @@ ExampleScene::ExampleScene() {
 	}
 	cardData << is;
 	is.close();
+
+	//DEBUG: output specific cards
+//	std::cout << cardData["Aboroth"]["text"] << std::endl;
 }
 
 ExampleScene::~ExampleScene() {
@@ -70,64 +73,86 @@ void ExampleScene::FrameEnd() {
 }
 
 void ExampleScene::RenderFrame(SDL_Renderer* renderer) {
-	SDL_Texture* name = nullptr;
-	SDL_Texture* manaCost = nullptr;
+	SDL_Texture* texture = nullptr;
 	SDL_Rect src, dest;
 
 	int line = 0;
 
 	for (auto& it : cardData) {
 		//render name
-		name = RenderText(renderer, it["name"]);
+		texture = RenderPlainText(renderer, it["name"]);
+
+		//get the stats for name, then draw
+		src = SDL_Rect{0, 0};
+		SDL_QueryTexture(texture, nullptr, nullptr, &src.w, &src.h);
+		dest = SDL_Rect{32, 32 + 16 * line, src.w, src.h};
+		SDL_RenderCopy(renderer, texture, &src, &dest);
+
+		//cleanup
+		SDL_DestroyTexture(texture);
+		texture = nullptr;
 
 		//render mana (if applicable)
 		try {
 			if (it["manaCost"].type() != nlohmann::json::value_t::null) {
-				manaCost = RenderManaCost(renderer, it["manaCost"]);
+				texture = RenderManaCost(renderer, it["manaCost"]);
+
+				//get the stats for manaCost, then draw
+				src = SDL_Rect{0, 0};
+				SDL_QueryTexture(texture, nullptr, nullptr, &src.w, &src.h);
+				dest = SDL_Rect{300, 32 + 16 * line, src.w, src.h};
+				SDL_RenderCopy(renderer, texture, &src, &dest);
+
+				//cleanup
+				SDL_DestroyTexture(texture);
+				texture = nullptr;
 			}
 		}
 		catch(std::exception& e) {
 			//find what cards break the system
 			std::ostringstream msg;
-			msg << e.what() << "; " << it["name"] << "; " << it["manaCost"];
+			msg << e.what() << "; " << it["name"] << "; manaCost: " << it["manaCost"];
 			throw(std::runtime_error(msg.str()));
 		}
 
-		//get the stats for name, then draw
-		src = SDL_Rect{0, 0};
-		SDL_QueryTexture(name, nullptr, nullptr, &src.w, &src.h);
-		dest = SDL_Rect{32, 32 + 16 * line, src.w, src.h};
-		SDL_RenderCopy(renderer, name, &src, &dest);
+		//render text (if applicable)
+		try {
+			if (it["text"].type() != nlohmann::json::value_t::null) {
+				texture = RenderPlainText(renderer, it["text"]);
 
-		//cleanup
-		SDL_DestroyTexture(name);
+				//get the stats for text, then draw
+				src = SDL_Rect{0, 0};
+				SDL_QueryTexture(texture, nullptr, nullptr, &src.w, &src.h);
+				dest = SDL_Rect{400, 32 + 16 * line, src.w, src.h};
+				SDL_RenderCopy(renderer, texture, &src, &dest);
 
-		if (manaCost) {
-			//get the stats for manaCost, then draw
-			src = SDL_Rect{0, 0};
-			SDL_QueryTexture(manaCost, nullptr, nullptr, &src.w, &src.h);
-			dest = SDL_Rect{300, 32 + 16 * line, src.w, src.h};
-			SDL_RenderCopy(renderer, manaCost, &src, &dest);
-
-			//cleanup
-			SDL_DestroyTexture(manaCost);
+				//cleanup
+				SDL_DestroyTexture(texture);
+				texture = nullptr;
+			}
+		}
+		catch(std::exception& e) {
+			//find what cards break the system
+			std::ostringstream msg;
+			msg << e.what() << "; " << it["name"] << "; text: " << it["text"];
+			throw(std::runtime_error(msg.str()));
 		}
 
-		//emergency cap
+		//DEBUG: emergency cap
 		if (line++ >= 50) break;
 	}
 
 	//DEBUG: draw the number of cards
 	char debug[64];
 	sprintf(debug, "Cards indexed: %lu", cardData.size());
-	SDL_Texture* indexCount = RenderText(renderer, debug);
+	texture = RenderPlainText(renderer, debug);
 	src = SDL_Rect{0, 0};
-	SDL_QueryTexture(indexCount, nullptr, nullptr, &src.w, &src.h);
+	SDL_QueryTexture(texture, nullptr, nullptr, &src.w, &src.h);
 	dest = SDL_Rect{800 - 16 - src.w, 16, src.w, src.h};
-	SDL_RenderCopy(renderer, indexCount, &src, &dest);
+	SDL_RenderCopy(renderer, texture, &src, &dest);
 
 	//cleanup
-	SDL_DestroyTexture(manaCost);
+	SDL_DestroyTexture(texture);
 }
 
 //-------------------------
@@ -255,7 +280,7 @@ void ExampleScene::DestroyIndex() {
 	manaIndex.clear();
 }
 
-SDL_Texture* ExampleScene::RenderText(SDL_Renderer* renderer, std::string text) {
+SDL_Texture* ExampleScene::RenderPlainText(SDL_Renderer* renderer, std::string text) {
 	//DOCS: quick and dirty
 	SDL_Color color = {255, 255, 255, 255}; //white
 
@@ -279,7 +304,7 @@ SDL_Texture* ExampleScene::RenderText(SDL_Renderer* renderer, std::string text) 
 	return texture;
 }
 
-SDL_Texture* ExampleScene::RenderManaCost(SDL_Renderer* renderer, std::string str) {
+SDL_Texture* ExampleScene::RenderManaCost(SDL_Renderer* renderer, std::string text) {
 	//handle oddball manacosts
 	bool oddball = false;
 
@@ -287,7 +312,7 @@ SDL_Texture* ExampleScene::RenderManaCost(SDL_Renderer* renderer, std::string st
 	std::stack<std::string> manaCodes;
 
 	//get the raw text
-	char* rawText = (char*)(str.c_str());
+	char* rawText = (char*)(text.c_str());
 
 	//count the symbols present
 	int count = 0;
@@ -322,8 +347,7 @@ SDL_Texture* ExampleScene::RenderManaCost(SDL_Renderer* renderer, std::string st
 		SDL_PIXELFORMAT_RGBA8888,
 		SDL_TEXTUREACCESS_TARGET,
 		oddball ? 512 : 12 * manaCodes.size(), //use 12px sizes to match the text, or 512 for oddball cards
-		12
-		);
+		12);
 
 	//draw to the texture
 	SDL_SetRenderTarget(renderer, texture);
@@ -337,5 +361,98 @@ SDL_Texture* ExampleScene::RenderManaCost(SDL_Renderer* renderer, std::string st
 	SDL_SetRenderTarget(renderer, nullptr);
 
 	//return this texture
+	return texture;
+}
+
+SDL_Texture* ExampleScene::RenderRulesText(SDL_Renderer* renderer, std::string text) {
+	//BUG: Don't use this, it doesn't work, and is incomplete anyway
+	//DOCS: Handles plaintext, mana costs, and reminder text.
+	//DOCS: For the time being, render the entire text on a single line
+	//BUG: Known issue with em dash (dec code 8212)
+	//TODO: RenderRulesText() is incomplete
+	SDL_Color color = {255, 255, 255, 255}; //white
+
+	char* rawText = (char*)(text.c_str());
+	int len = text.length();
+	char textSegment[len+1];
+	SDL_Surface* surface = nullptr;
+	SDL_Texture* texture = nullptr;
+	int resultWidth = 0; //the width of the final texture to return
+
+	//hold rendered segments in reverse order
+	std::stack<SDL_Texture*> segmentStack;
+
+	//iterate over each segment
+	while (*rawText) {
+		memset(textSegment, 0, len+1);
+
+		//read normal text
+		if (sscanf(rawText, "%[^{]", textSegment)) {
+			//make the surface (from SDL_ttf)
+			surface = TTF_RenderText_Solid(font, textSegment, color);
+			if (!surface) {
+				throw(std::runtime_error("Failed to create a TTF surface"));
+			}
+
+			//convert to texture
+			texture = SDL_CreateTextureFromSurface(renderer, surface);
+			if (!texture) {
+				SDL_FreeSurface(surface);
+				throw(std::runtime_error("Failed to create a TTF texture"));
+			}
+
+			//store the metadata
+			int w = 0;
+			SDL_QueryTexture(texture, nullptr, nullptr, &w, nullptr);
+			resultWidth += w;
+
+			//push to the stack
+			segmentStack.push(texture);
+
+			//cleanup
+			SDL_FreeSurface(surface);
+			surface = nullptr;
+			texture = nullptr;
+
+			//move to the next segment
+			rawText += strlen(textSegment);
+			continue;
+		}
+
+		break; //DEBUG: loop here
+	}
+
+	//render all existing textures together
+	texture = SDL_CreateTexture(renderer,
+		SDL_PIXELFORMAT_RGBA8888,
+		SDL_TEXTUREACCESS_TARGET,
+		resultWidth, 12);
+
+	SDL_SetRenderTarget(renderer, texture);
+	SDL_RenderClear(renderer);
+
+	//positions
+	int renderX = resultWidth;
+	SDL_Rect src, dest;
+
+	//loop backwards
+	while(!segmentStack.empty()) {
+		//get src & dest
+		src = {0, 0};
+		SDL_QueryTexture(segmentStack.top(), nullptr, nullptr, &src.w, &src.h);
+		renderX -= src.w;
+		dest = {renderX, 0, src.w, src.h};
+
+		//render
+		SDL_RenderCopy(renderer, segmentStack.top(), &src, &dest);
+
+		//clear this segment
+		SDL_DestroyTexture(segmentStack.top());
+		segmentStack.pop();
+	}
+
+	//finish the function
+	SDL_SetRenderTarget(renderer, nullptr);
+
 	return texture;
 }

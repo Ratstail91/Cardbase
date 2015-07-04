@@ -56,8 +56,9 @@ private:
 	void CreateIndex();
 	void DestroyIndex();
 
-	SDL_Texture* RenderText(SDL_Renderer*, std::string);
+	SDL_Texture* RenderPlainText(SDL_Renderer*, std::string);
 	SDL_Texture* RenderManaCost(SDL_Renderer*, std::string);
+	SDL_Texture* RenderRulesText(SDL_Renderer*, std::string);
 
 	TTF_Font* font = nullptr;
 	Image masterManaSheet;

@@ -1,0 +1,361 @@
+1	Abzan Advantage
+1	Adaptive Snapjaw
+1	Advantageous Proclamation
+1	Aerial Maneuver
+1	Aerial Predation
+1	Ainok Guide
+1	Air Servant
+1	Alloy Myr
+1	Ambush Krotiq
+1	Ancient Carp
+1	Angel's Mercy
+1	Angelic Edict
+1	Annihilating Fire
+1	Anticipate
+1	Aqueous Form
+1	Arc Lightning
+1	Archweaver
+1	Armory Guard
+1	Armory of Iroas
+1	Arrest
+1	Artful Maneuver
+1	Ashenmoor Gouger
+1	Assassin's Strike
+1	Auramancer
+1	Aven Surveyor
+1	Avenging Arrow
+1	Axebane Guardian
+1	Axebane Stag
+1	Azorius Guildgate
+1	Azorius Justiciar
+1	Baleful Eidolon
+1	Balustrade Spy
+1	Basilica Guards
+1	Basilica Screecher
+1	Batterhorn
+1	Battering Krasis
+1	Become Immense
+1	Belligerent Sliver
+1	Bellows Lizard
+1	Bioshift
+1	Bitter Revelation
+1	Blades of Velis Vel
+1	Blistercoil Weird
+1	Blood Ogre
+1	Boon of Erebos
+1	Boros Guildgate
+1	Boros Mastiff
+1	Briarpack Alpha
+1	Brushstrider
+1	Brute Force
+1	Cancel
+1	Catacomb Slug
+1	Chandra's Outrage
+1	Chorus of Might
+1	Chosen by Heliod
+1	Claim of Erebos
+1	Clinging Anemones
+1	Cloud Elemental
+1	Cloudfin Raptor
+1	Cobblebrute
+1	Codex Shredder
+1	Coerced Confession
+1	Commune with the Gods
+1	Concordia Pegasus
+1	Constricting Sliver
+1	Contaminated Ground
+1	Contradict
+1	Coral Barrier
+1	Corpse Blockade
+1	Countermand
+1	Court Homunculus
+1	Court Street Denizen
+1	Covenant of Blood
+1	Crocanura
+1	Crosstown Courier
+1	Crowd's Favor
+1	Crypt Incursion
+1	Cudgel Troll
+1	Daggerdrome Imp
+1	Daring Skyjek
+1	Darksteel Axe
+1	Dead Weight
+1	Death's Approach
+1	Deathcult Rogue
+1	Debilitating Injury
+1	Defeat
+1	Defend the Hearth
+1	Demolish
+1	Destroy the Evidence
+1	Devour Flesh
+1	Dimir Guildgate
+1	Dirgur Nemesis
+1	Disciple of the Old Ways
+1	Dispel
+1	Disperse
+1	Dissipate
+1	Dissolve
+1	Divine Favor
+1	Doomed Traveler
+1	Doorkeeper
+1	Downsize
+1	Dragon Egg
+1	Dragon Hatchling
+1	Dragon Mantle
+1	Dragon's Eye Sentry
+1	Dragonsoul Knight
+1	Drainpipe Vermin
+1	Dying Wish
+1	Dynacharge
+1	Elvish Mystic
+1	Ember Beast
+1	Ethereal Armor
+1	Experiment One
+1	Eyes in the Skies
+1	Fascination
+1	Fatal Fumes
+1	Fate Foretold
+1	Fencing Ace
+1	Fiery Hellhound
+1	First Response
+1	Fleshmad Steed
+1	Font of Fortunes
+1	Font of Return
+1	Force Away
+1	Forced Adaptation
+1	Frontier Mastodon
+1	Frostburn Weird
+1	Furious Resistance
+1	Gatecreeper Vine
+1	Gateway Shade
+1	Geistcatcher's Rig
+1	Ghostly Changeling
+1	Ghostly Possession
+1	Ghoulcaller's Bell
+1	Giant Growth
+1	Gladecover Scout
+1	Glaring Aegis
+1	Glint Hawk Idol
+1	Gobbling Ooze
+1	Goblin Shortcutter
+1	Golgari Guildgate
+1	Gorehorn Minotaurs
+1	Greater Basilisk
+1	Greenside Watcher
+1	Grim Roustabout
+1	Grisly Spectacle
+1	Groundshaker Sliver
+1	Gruul Guildgate
+2	Guardians of Meletis
+1	Gurmag Drowner
+1	Gurmag Swiftwing
+1	Gutter Skulk
+1	Heir of the Wilds
+1	Hewed Stone Retainers
+1	Highland Game
+1	Hired Torturer
+1	Hive Stirrings
+1	Hooting Mandrills
+1	Hopeful Eidolon
+1	Horncaller's Chant
+1	Hover Barrier
+1	Humble Defector
+1	Hunt the Hunter
+1	Hunt the Weak
+1	Inner-Flame Igniter
+1	Inspiration
+1	Ivy Lane Denizen
+1	Izzet Guildgate
+1	Jade Mage
+1	Jeskai Sage
+1	Kalonian Tusker
+1	Karametra's Favor
+1	Keening Apparition
+1	Knight Watch
+1	Knightly Valor
+1	Kolaghan Stormsinger
+1	Kozilek's Predator
+1	Lagonna-Band Elder
+1	Last Thoughts
+1	Lens of Clarity
+1	Leyline Phantom
+1	Lifelink
+1	Lightning Strike
+1	Lobber Crew
+1	Lost in a Labyrinth
+1	Lure
+1	Madcap Skills
+1	Magma Jet
+1	Manaweft Sliver
+1	March of the Returned
+1	Market Festival
+1	Maze Rusher
+1	Mental Vapors
+1	Midnight Recovery
+1	Millennial Gargoyle
+1	Mind Rot
+1	Mind Sculpt
+1	Mindeye Drake
+1	Minotaur Aggressor
+1	Mistfire Adept
+1	Mugging
+1	Murder
+1	Murmuring Phantasm
+1	Myr Enforcer
+1	Mystic Meditation
+1	Naturalize
+1	Nature's Panoply
+1	Nav Squad Commandos
+1	Negate
+1	Nylea's Disciple
+1	Nylea's Presence
+1	Observant Alseid
+1	Ogre Jailbreaker
+1	Ojutai's Summons
+1	Opal Lake Gatekeepers
+1	Opportunity
+1	Orzhov Guildgate
+1	Otherworldly Journey
+1	Pacifism
+1	Perilous Shadow
+1	Phantom General
+1	Pilgrim of the Fires
+1	Pillar of War
+1	Pit Fight
+1	Plated Sliver
+1	Profane Memento
+1	Prophetic Prism
+1	Prowler's Helm
+1	Psychic Spiral
+1	Quiet Contemplation
+1	Racecourse Fury
+1	Rakdos Cackler
+1	Rakdos Drake
+1	Rakdos Guildgate
+1	Rakdos Shred-Freak
+1	Rampant Growth
+1	Rancor
+1	Ray of Dissolution
+1	Razortip Whip
+1	Refocus
+1	Regathan Firecat
+1	Research Assistant
+1	Resupply
+1	Returned Reveler
+1	Riddle of Lightning
+1	Ripscale Predator
+1	Rogue's Passage
+1	Rogue’s Gloves
+1	Rootborn Defenses
+1	Rubbleback Rhino
+1	Rumbling Baloth
+1	Rummaging Goblin
+1	Runewing
+1	Ruthless Ripper
+1	Sacred Wolf
+1	Sage-Eye Harrier
+1	Sandblast
+1	Sapphire Drake
+1	Satyr Piper
+1	Savage Surge
+1	Scatter Arc
+1	Scorchwalker
+1	Scroll Thief
+1	Sedge Scorpion
+1	Segmented Krotiq
+1	Selesnya Guildgate
+1	Seller of Songbirds
+1	Sentinel Sliver
+1	Sewer Shambler
+1	Shadow Alley Denizen
+1	Shadow Slice
+1	Shielded Passage
+1	Shimmering Grotto
+1	Shiv's Embrace
+1	Show of Valor
+1	Shredding Winds
+1	Shrieking Affliction
+1	Sickle Ripper
+1	Sidisi's Faithful
+1	Sigiled Starfish
+1	Simic Guildgate
+1	Sinister Possession
+1	Skyblinder Staff
+1	Skyhunter Skirmisher
+1	Skyline Predator
+1	Slate Street Ruffian
+1	Slitherhead
+1	Sliver Construct
+1	Slum Reaper
+1	Smallpox
+1	Smelt-Ward Gatekeepers
+1	Smite
+1	Solidarity of Heroes
+1	Soul Tithe
+1	Soulmender
+1	Sphere of Safety
+1	Sphere of the Suns
+1	Spirit Mantle
+1	Splatter Thug
+1	Squelching Leeches
+1	Stab Wound
+1	Statute of Denial
+1	Stealer of Secrets
+1	Steelform Sliver
+1	Steeple Roc
+1	Stormrider Rig
+1	Street Spasm
+1	Street Sweeper
+1	Stymied Hopes
+1	Sultai Skullkeeper
+1	Survey the Wreckage
+1	Swift Justice
+1	Syncopate
+1	Syndic of Tithes
+1	Syndicate Enforcer
+1	Taigam's Scheming
+1	Tavern Swindler
+1	Tenement Crasher
+1	Terrus Wurm
+1	Thran Golem
+1	Thrashing Mossdog
+1	Thrill-Kill Assassin
+1	Tin Street Market
+1	Toil / Trouble
+1	Tome Scour
+1	Tormented Hero
+1	Tormented Soul
+1	Towering Indrik
+1	Trained Caracal
+1	Traitorous Instinct
+1	Transguild Promenade
+1	Traveler's Amulet
+1	Treasure Cruise
+1	Triplicate Spirits
+1	Trollhide
+1	Trostani's Judgment
+1	Tukatongue Thallid
+1	Tusked Colossodon
+1	Two-Headed Cerberus
+1	Ultimate Price
+1	Uncovered Clues
+1	Undercity Informer
+1	Unknown Shores
+1	Vassal Soul
+1	Verdant Haven
+1	Viashino Racketeer
+1	Vines of Vastwood
+1	Viper's Kiss
+1	Voidwielder
+1	Vow of Duty
+1	Voyage's End
+1	Wall of Frost
+1	Warclamp Mastiff
+1	Way of the Thief
+1	Wear / Tear
+1	Whirlwind Adept
+1	Wildwood Rebirth
+1	Windstorm
+1	Witches' Eye
+
+

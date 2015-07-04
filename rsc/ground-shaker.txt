@@ -1,0 +1,20 @@
+4	Bloodfell Caves
+1	Boltwing Marauder
+3	Circle of Flame
+4	Dragon Fodder
+2	Dragonrage
+4	Foundry Street Denizen
+4	Goblin Heelcutter
+2	Goblinslide
+2	Hardened Berserker
+2	Hordeling Outburst
+2	Howl of the Horde
+4	Impact Tremors
+1	Kolaghan, the Storm's Fury
+20	Mountain
+1	Staff of the Flame Magus
+2	Tormenting Voice
+1	Vaultbreaker
+1	Zurgo Bellstriker
+
+

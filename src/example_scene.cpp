@@ -35,11 +35,11 @@ ExampleScene::ExampleScene() {
 	}
 
 	//graphics
-	masterManaSheet.Load(GetRenderer(), "../rsc/Mana.png");
+	masterManaSheet.Load(GetRenderer(), "rsc/Mana.png");
 	CreateIndex();
 
 	//read and store the .json file
-	std::ifstream is("../rsc/AllCards.json");
+	std::ifstream is("rsc/AllCards.json");
 
 	if (!is.is_open()) {
 		throw(std::runtime_error("Failed to open the json file for reading"));
@@ -142,16 +142,15 @@ void ExampleScene::RenderFrame(SDL_Renderer* renderer) {
 		if (line++ >= 50) break;
 	}
 
-	//DEBUG: draw the number of cards
+	//DEBUG: draw the framerate & number of cards
+	frameRate.Calculate();
 	char debug[64];
-	sprintf(debug, "Cards indexed: %lu", cardData.size());
+	sprintf(debug, "FPS: %d, Cards indexed: %lu", frameRate.GetFrameRate(), cardData.size());
 	texture = RenderPlainText(renderer, debug);
 	src = SDL_Rect{0, 0};
 	SDL_QueryTexture(texture, nullptr, nullptr, &src.w, &src.h);
-	dest = SDL_Rect{800 - 16 - src.w, 16, src.w, src.h};
+	dest = SDL_Rect{0, 0, src.w, src.h};
 	SDL_RenderCopy(renderer, texture, &src, &dest);
-
-	//cleanup
 	SDL_DestroyTexture(texture);
 }
 
@@ -361,98 +360,5 @@ SDL_Texture* ExampleScene::RenderManaCost(SDL_Renderer* renderer, std::string te
 	SDL_SetRenderTarget(renderer, nullptr);
 
 	//return this texture
-	return texture;
-}
-
-SDL_Texture* ExampleScene::RenderRulesText(SDL_Renderer* renderer, std::string text) {
-	//BUG: Don't use this, it doesn't work, and is incomplete anyway
-	//DOCS: Handles plaintext, mana costs, and reminder text.
-	//DOCS: For the time being, render the entire text on a single line
-	//BUG: Known issue with em dash (dec code 8212)
-	//TODO: RenderRulesText() is incomplete
-	SDL_Color color = {255, 255, 255, 255}; //white
-
-	char* rawText = (char*)(text.c_str());
-	int len = text.length();
-	char textSegment[len+1];
-	SDL_Surface* surface = nullptr;
-	SDL_Texture* texture = nullptr;
-	int resultWidth = 0; //the width of the final texture to return
-
-	//hold rendered segments in reverse order
-	std::stack<SDL_Texture*> segmentStack;
-
-	//iterate over each segment
-	while (*rawText) {
-		memset(textSegment, 0, len+1);
-
-		//read normal text
-		if (sscanf(rawText, "%[^{]", textSegment)) {
-			//make the surface (from SDL_ttf)
-			surface = TTF_RenderText_Solid(font, textSegment, color);
-			if (!surface) {
-				throw(std::runtime_error("Failed to create a TTF surface"));
-			}
-
-			//convert to texture
-			texture = SDL_CreateTextureFromSurface(renderer, surface);
-			if (!texture) {
-				SDL_FreeSurface(surface);
-				throw(std::runtime_error("Failed to create a TTF texture"));
-			}
-
-			//store the metadata
-			int w = 0;
-			SDL_QueryTexture(texture, nullptr, nullptr, &w, nullptr);
-			resultWidth += w;
-
-			//push to the stack
-			segmentStack.push(texture);
-
-			//cleanup
-			SDL_FreeSurface(surface);
-			surface = nullptr;
-			texture = nullptr;
-
-			//move to the next segment
-			rawText += strlen(textSegment);
-			continue;
-		}
-
-		break; //DEBUG: loop here
-	}
-
-	//render all existing textures together
-	texture = SDL_CreateTexture(renderer,
-		SDL_PIXELFORMAT_RGBA8888,
-		SDL_TEXTUREACCESS_TARGET,
-		resultWidth, 12);
-
-	SDL_SetRenderTarget(renderer, texture);
-	SDL_RenderClear(renderer);
-
-	//positions
-	int renderX = resultWidth;
-	SDL_Rect src, dest;
-
-	//loop backwards
-	while(!segmentStack.empty()) {
-		//get src & dest
-		src = {0, 0};
-		SDL_QueryTexture(segmentStack.top(), nullptr, nullptr, &src.w, &src.h);
-		renderX -= src.w;
-		dest = {renderX, 0, src.w, src.h};
-
-		//render
-		SDL_RenderCopy(renderer, segmentStack.top(), &src, &dest);
-
-		//clear this segment
-		SDL_DestroyTexture(segmentStack.top());
-		segmentStack.pop();
-	}
-
-	//finish the function
-	SDL_SetRenderTarget(renderer, nullptr);
-
 	return texture;
 }

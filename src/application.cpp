@@ -52,7 +52,7 @@ void Application::Init(int argc, char* argv[]) {
 
 	//screen scaling
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "best");
-	SDL_RenderSetLogicalSize(renderer, screenWidth, screenHeight);
+//	SDL_RenderSetLogicalSize(renderer, screenWidth, screenHeight);
 
 	//set the hook for the renderer
 	BaseScene::SetRenderer(renderer);

@@ -38,7 +38,7 @@ ExampleScene::ExampleScene() {
 	masterManaSheet.Load(GetRenderer(), "rsc/Mana.png");
 	CreateIndex();
 
-	//read and store the .json file
+	//read and store the .json file for the cards
 	std::ifstream is("rsc/AllCards.json");
 
 	if (!is.is_open()) {
@@ -47,8 +47,21 @@ ExampleScene::ExampleScene() {
 	cardData << is;
 	is.close();
 
-	//DEBUG: output specific cards
-//	std::cout << cardData["Aboroth"]["text"] << std::endl;
+	//build a list of specific cards
+	is.open("rsc/newbiks-cube.txt");
+	if (!is.is_open()) {
+		throw(std::runtime_error("Failed to open the deck list for reading"));
+	}
+	std::string name;
+	int count;
+
+	while(!is.eof()) {
+		is >> count; //number of copies
+		is.get(); //discard tab character
+		getline(is, name); //name
+		cardList[name] = cardData[name];
+		cardList[name]["count"] = count;
+	}
 }
 
 ExampleScene::~ExampleScene() {
@@ -73,80 +86,22 @@ void ExampleScene::FrameEnd() {
 }
 
 void ExampleScene::RenderFrame(SDL_Renderer* renderer) {
-	SDL_Texture* texture = nullptr;
-	SDL_Rect src, dest;
-
-	int line = 0;
-
-	for (auto& it : cardData) {
-		//render name
-		texture = RenderPlainText(renderer, it["name"]);
-
-		//get the stats for name, then draw
-		src = SDL_Rect{0, 0};
-		SDL_QueryTexture(texture, nullptr, nullptr, &src.w, &src.h);
-		dest = SDL_Rect{32, 32 + 16 * line, src.w, src.h};
-		SDL_RenderCopy(renderer, texture, &src, &dest);
-
-		//cleanup
-		SDL_DestroyTexture(texture);
-		texture = nullptr;
-
-		//render mana (if applicable)
-		try {
-			if (it["manaCost"].type() != nlohmann::json::value_t::null) {
-				texture = RenderManaCost(renderer, it["manaCost"]);
-
-				//get the stats for manaCost, then draw
-				src = SDL_Rect{0, 0};
-				SDL_QueryTexture(texture, nullptr, nullptr, &src.w, &src.h);
-				dest = SDL_Rect{300, 32 + 16 * line, src.w, src.h};
-				SDL_RenderCopy(renderer, texture, &src, &dest);
-
-				//cleanup
-				SDL_DestroyTexture(texture);
-				texture = nullptr;
-			}
-		}
-		catch(std::exception& e) {
-			//find what cards break the system
-			std::ostringstream msg;
-			msg << e.what() << "; " << it["name"] << "; manaCost: " << it["manaCost"];
-			throw(std::runtime_error(msg.str()));
-		}
-
-		//render text (if applicable)
-		try {
-			if (it["text"].type() != nlohmann::json::value_t::null) {
-				texture = RenderPlainText(renderer, it["text"]);
-
-				//get the stats for text, then draw
-				src = SDL_Rect{0, 0};
-				SDL_QueryTexture(texture, nullptr, nullptr, &src.w, &src.h);
-				dest = SDL_Rect{400, 32 + 16 * line, src.w, src.h};
-				SDL_RenderCopy(renderer, texture, &src, &dest);
-
-				//cleanup
-				SDL_DestroyTexture(texture);
-				texture = nullptr;
-			}
-		}
-		catch(std::exception& e) {
-			//find what cards break the system
-			std::ostringstream msg;
-			msg << e.what() << "; " << it["name"] << "; text: " << it["text"];
-			throw(std::runtime_error(msg.str()));
-		}
-
-		//DEBUG: emergency cap
-		if (line++ >= 50) break;
+	//TODO
+	try {
+		RenderCardList(renderer, cardList, 32, 32);
+	}
+	catch(std::exception& e) {
+		std::cerr << "intercepted list error: " << e.what() << std::endl;
+		throw(-1);
 	}
 
 	//DEBUG: draw the framerate & number of cards
+	SDL_Rect src, dest;
 	frameRate.Calculate();
-	char debug[64];
-	sprintf(debug, "FPS: %d, Cards indexed: %lu", frameRate.GetFrameRate(), cardData.size());
-	texture = RenderPlainText(renderer, debug);
+	std::ostringstream os;
+	os << "FPS: " << std::setw(8) << std::left << frameRate.GetFrameRate() << "Cards indexed: " << cardData.size();
+
+	SDL_Texture* texture = RenderPlainText(renderer, os.str());
 	src = SDL_Rect{0, 0};
 	SDL_QueryTexture(texture, nullptr, nullptr, &src.w, &src.h);
 	dest = SDL_Rect{0, 0, src.w, src.h};
@@ -361,4 +316,62 @@ SDL_Texture* ExampleScene::RenderManaCost(SDL_Renderer* renderer, std::string te
 
 	//return this texture
 	return texture;
+}
+
+void ExampleScene::RenderCardList(SDL_Renderer* renderer, nlohmann::json list, int x, int y) {
+	SDL_Texture* texture = nullptr;
+	SDL_Rect src, dest;
+	int line = 0;
+
+	for (auto& it : list) {
+		//get the count & name, formatted
+		std::ostringstream count, name;
+		count << it["count"] << "x";
+
+		//render count
+		texture = RenderPlainText(renderer, count.str());
+
+		//get the stats for the texture, then draw
+		src = SDL_Rect{0, 0};
+		SDL_QueryTexture(texture, nullptr, nullptr, &src.w, &src.h);
+		dest = SDL_Rect{x, y + 16 * line, src.w, src.h};
+		SDL_RenderCopy(renderer, texture, &src, &dest);
+		SDL_DestroyTexture(texture);
+		texture = nullptr;
+
+		//render name
+		texture = RenderPlainText(renderer, it["name"].dump().substr(1, it["name"].dump().size()-2));
+
+		//get the stats for the texture, then draw
+		src = SDL_Rect{0, 0};
+		SDL_QueryTexture(texture, nullptr, nullptr, &src.w, &src.h);
+		dest = SDL_Rect{x+32, y + 16 * line, src.w, src.h};
+		SDL_RenderCopy(renderer, texture, &src, &dest);
+		SDL_DestroyTexture(texture);
+		texture = nullptr;
+
+		//render mana (if applicable)
+		try {
+			if (it["manaCost"].type() != nlohmann::json::value_t::null) {
+				texture = RenderManaCost(renderer, it["manaCost"]);
+
+				//get the stats for manaCost, then draw
+				src = SDL_Rect{0, 0};
+				SDL_QueryTexture(texture, nullptr, nullptr, &src.w, &src.h);
+				dest = SDL_Rect{x + 300, y + 16 * line, src.w, src.h};
+				SDL_RenderCopy(renderer, texture, &src, &dest);
+				SDL_DestroyTexture(texture);
+				texture = nullptr;
+			}
+		}
+		catch(std::exception& e) {
+			//find what cards break the system
+			std::ostringstream msg;
+			msg << e.what() << "; " << it["name"] << "; manaCost: " << it["manaCost"];
+			throw(std::runtime_error(msg.str()));
+		}
+
+		//pretty output
+		line++;
+	}
 }

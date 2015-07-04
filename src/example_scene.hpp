@@ -60,9 +60,12 @@ private:
 	SDL_Texture* RenderPlainText(SDL_Renderer*, std::string);
 	SDL_Texture* RenderManaCost(SDL_Renderer*, std::string);
 
+	void RenderCardList(SDL_Renderer*, nlohmann::json list, int x, int y);
+
 	FrameRate frameRate;
 	TTF_Font* font = nullptr;
 	Image masterManaSheet;
 	std::map<std::string, Image*> manaIndex;
 	nlohmann::json cardData;
+	nlohmann::json cardList;
 };

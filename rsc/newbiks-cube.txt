@@ -12,7 +12,6 @@
 1	Angelic Edict
 1	Annihilating Fire
 1	Anticipate
-1	Aqueous Form
 1	Arc Lightning
 1	Archweaver
 1	Armory Guard
@@ -223,6 +222,7 @@
 1	Pillar of War
 1	Pit Fight
 1	Plated Sliver
+1	Ponder
 1	Profane Memento
 1	Prophetic Prism
 1	Prowler's Helm
@@ -357,5 +357,3 @@
 1	Wildwood Rebirth
 1	Windstorm
 1	Witches' Eye
-
-

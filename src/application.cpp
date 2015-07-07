@@ -110,7 +110,7 @@ void Application::Proc() {
 }
 
 void Application::Quit() {
-	//cleran up after the program
+	//clean up after the program
 	BaseScene::SetRenderer(nullptr);
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);

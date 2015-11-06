@@ -19,23 +19,4 @@
  * 3. This notice may not be removed or altered from any source
  * distribution.
 */
-#include "application.hpp"
-
-#include "SDL2/SDL.h"
-
-#include <iostream>
-#include <stdexcept>
-
-int main(int argc, char** argv) {
-	try {
-		Application app;
-		app.Init(argc, argv);
-		app.Proc();
-		app.Quit();
-	}
-	catch(std::exception& e) {
-		std::cerr << "Fatal Error: " << e.what() << std::endl;
-		return 1;
-	}
-	return 0;
-}
+#include "json.hpp"

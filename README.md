@@ -2,9 +2,7 @@ Move along, nothing to see here.
 
 ## External Dependencies
 
-* [SDL 2.0](http://www.libsdl.org/) - Simple DirectMedia Layer API
-* [SDL_image](https://www.libsdl.org/projects/SDL_image/) - An SDL Extension for loading multiple image file formats
-* [SDL_ttf](https://www.libsdl.org/projects/SDL_ttf/) - An SDL extention for rendering fonts
+* N/a
 
 ## Credits
 

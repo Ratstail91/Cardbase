@@ -7,14 +7,10 @@ LIBS+=
 ifeq ($(OS),Windows_NT)
 	LIBS+=-lmingw32
 endif
-LIBS+=-lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf
+LIBS+=
 
 #flags
 CXXFLAGS+=-std=c++11 $(addprefix -I,$(INCLUDES))
-ifeq ($(shell uname), Linux)
-	#read data about the current install
-	CXXFLAGS+=$(shell sdl-config --cflags --static-libs)
-endif
 
 #source
 CXXSRC=$(wildcard *.cpp)
@@ -25,7 +21,7 @@ OBJ+=$(addprefix $(OBJDIR)/,$(CXXSRC:.cpp=.o))
 
 #output
 OUTDIR=../out
-OUT=$(addprefix $(OUTDIR)/,Cardbase)
+OUT=$(addprefix $(OUTDIR)/,cardbase)
 
 #targets
 all: $(OBJ) $(OUT)

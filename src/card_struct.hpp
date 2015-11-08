@@ -40,6 +40,7 @@ struct CardStruct {
 	bool foil = false;
 	int count = 0;
 	CardGrade grade = CardGrade::NEAR_MINT;
+	//TODO: tags i.e. what deck lists it's included in
 };
 
 typedef std::list<CardStruct> CardList;

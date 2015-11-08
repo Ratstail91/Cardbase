@@ -19,4 +19,50 @@
  * 3. This notice may not be removed or altered from any source
  * distribution.
 */
+#include "card_struct.hpp"
+#include "format.hpp"
 #include "json.hpp"
+
+#include <iomanip>
+#include <iostream>
+
+int main(int argc, char* argv[]) {
+	//read a card list
+	CardList cardList = readCSV("/home/kayne/Dropbox/rare inventory");
+
+	//print the loaded data
+	for (auto& it : cardList) {
+		std::cout << std::left << std::setw(32) << it.name;
+		std::cout << std::left << std::setw(8) << it.code;
+
+		//special conditions
+		if (it.foil) {
+			std::cout << "Foil";
+
+			if (it.grade > CardGrade::NEAR_MINT) {
+				std::cout << ", ";
+			}
+		}
+
+		if (it.grade > CardGrade::NEAR_MINT) {
+			switch(it.grade) {
+				case CardGrade::LIGHTLY_PLAYED:
+					std::cout << "Lightly Played";
+				break;
+				case CardGrade::MODERATELY_PLAYED:
+					std::cout << "Moderately Played";
+				break;
+				case CardGrade::HEAVILY_PLAYED:
+					std::cout << "Heavily Played";
+				break;
+				case CardGrade::ERROR:
+					std::cout << "Grading Error";
+				break;
+			}
+		}
+
+		std::cout << std::endl;
+	}
+
+	return 0;
+}

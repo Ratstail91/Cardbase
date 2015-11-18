@@ -10,6 +10,9 @@ OUT=$(addprefix $(OUTDIR)/,Cardbase)
 all: $(OUTDIR)
 	$(MAKE) -C src
 
+debug: export CXXFLAGS+=-g
+debug: clean all
+
 $(OUTDIR):
 	mkdir $(OUTDIR)
 

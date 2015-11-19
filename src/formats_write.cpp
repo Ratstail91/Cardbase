@@ -21,6 +21,8 @@
 */
 #include "formats.hpp"
 
+#include <sstream>
+
 CSVObject<6> writeCardbaseCSV(std::list<CardEntry> cardList) {
 	CSVObject<6> obj;
 
@@ -59,13 +61,28 @@ CSVObject<6> writeCardbaseCSV(std::list<CardEntry> cardList) {
 }
 
 CSVObject<6> writeDeckboxCSV(std::list<CardEntry> cardList) {
-	//
+	//TODO: EMPTY
 }
 
 std::list<std::string> writePucatrade(std::list<CardEntry> cardList) {
-	//
+	//TODO: EMPTY
 }
 
 std::list<std::string> writeTappedoutDEK(std::list<CardEntry> cardList) {
-	//
+	std::list<std::string> ret;
+
+	for (auto& it : cardList) {
+		std::ostringstream os;
+
+		//count, name
+		os << it.count << "x " << it.name;
+		if (it.foil) {
+			os << " *F*";
+		}
+		os << " (" << it.code << ")";
+
+		ret.push_back(os.str());
+	}
+
+	return ret;
 }

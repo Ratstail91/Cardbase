@@ -36,8 +36,10 @@ int main(int argc, char* argv[]) {
 
 	//
 
-	CSVObject<6> obj2 = writeCardbaseCSV(cardList);
-	writeCSV<6>("dump.csv", obj2, ';');
+	std::list<std::string> to = writeTappedoutDEK(cardList);
+	for (auto& it : to) {
+		std::cout << it << std::endl;
+	}
 
 	return 0;
 }

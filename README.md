@@ -1,5 +1,12 @@
 Move along, nothing to see here.
 
+## Formats Supported
+
+* Cardbase CSV
+* Deckbox CSV
+* Pucatrade Importer
+* Tappedout.dek
+
 ## External Dependencies
 
 * N/a

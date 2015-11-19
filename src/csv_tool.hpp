@@ -24,7 +24,7 @@
 //DOCS: this is a generic CSV reading tool
 //DOCS: empty lines and comment lines begining with '#' are ignored
 //DOCS: whitespace characters are valid field values
-//DOCS: if the file is invalid, then the behaviour is undefined
+//DOCS: if the file is invalid, then the behavior is undefined
 
 #include <array>
 #include <cstring>

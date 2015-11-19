@@ -19,8 +19,10 @@
  * 3. This notice may not be removed or altered from any source
  * distribution.
 */
+#include "card_entry.hpp"
 #include "csv_tool.hpp"
 #include "json.hpp"
+#include "set_codes.hpp"
 
 #include <algorithm>
 #include <iomanip>
@@ -29,6 +31,6 @@
 int main(int argc, char* argv[]) {
 	CSVObject<3> obj = readCSV<3, ';'>("example.csv");
 
-	std::cout << obj[1][2] << std::endl;
+	std::cout << obj[1][1] << std::endl;
 	return 0;
 }

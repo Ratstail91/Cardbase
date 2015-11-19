@@ -19,25 +19,43 @@
  * 3. This notice may not be removed or altered from any source
  * distribution.
 */
+#pragma once
+
 #include "card_entry.hpp"
 #include "csv_tool.hpp"
-#include "formats.hpp"
-#include "json.hpp"
-#include "set_codes.hpp"
 
-#include <algorithm>
-#include <iomanip>
-#include <iostream>
 #include <list>
+#include <string>
 
-int main(int argc, char* argv[]) {
+/* DOCS: Format access
+
+cardbase.csv:
 	CSVObject<6> obj1 = readCSV<6>("cardbase.csv", ';');
 	std::list<CardEntry> cardList = readCardbaseCSV(obj1);
-
-	//
 
 	CSVObject<6> obj2 = writeCardbaseCSV(cardList);
 	writeCSV<6>("dump.csv", obj2, ';');
 
-	return 0;
-}
+deckbox.csv:
+	CSVObject<6> obj = readCSV<6, ';'>("deckbox.csv");
+	std::list<CardEntry> cardList = readDeckboxCSV(obj);
+
+pucatrade:
+	//
+
+tappedout.dek:
+	//
+
+*/
+
+//read
+std::list<CardEntry> readCardbaseCSV(CSVObject<6> obj);
+std::list<CardEntry> readDeckboxCSV(CSVObject<6> obj);
+std::list<CardEntry> readPucatrade(std::list<std::string>);
+std::list<CardEntry> readTappedoutDEK(std::list<std::string>);
+
+//write
+CSVObject<6> writeCardbaseCSV(std::list<CardEntry> cardList);
+CSVObject<6> writeDeckboxCSV(std::list<CardEntry> cardList);
+std::list<std::string> writePucatrade(std::list<CardEntry> cardList);
+std::list<std::string> writeTappedoutDEK(std::list<CardEntry> cardList);

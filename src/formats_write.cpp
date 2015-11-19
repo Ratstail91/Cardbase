@@ -19,25 +19,53 @@
  * 3. This notice may not be removed or altered from any source
  * distribution.
 */
-#include "card_entry.hpp"
-#include "csv_tool.hpp"
 #include "formats.hpp"
-#include "json.hpp"
-#include "set_codes.hpp"
 
-#include <algorithm>
-#include <iomanip>
-#include <iostream>
-#include <list>
+CSVObject<6> writeCardbaseCSV(std::list<CardEntry> cardList) {
+	CSVObject<6> obj;
 
-int main(int argc, char* argv[]) {
-	CSVObject<6> obj1 = readCSV<6>("cardbase.csv", ';');
-	std::list<CardEntry> cardList = readCardbaseCSV(obj1);
+	for (auto& it : cardList) {
+		CSVElement<6> record;
 
+		//strings
+		record[0] = it.name;
+		record[1] = it.code;
+		record[2] = it.language;
+
+		//enum
+		record[3] = [it]() -> std::string {
+			switch(it.grade) {
+				case Grade::MINT: return "M";
+				case Grade::NEAR_MINT: return "NM";
+				case Grade::LIGHTLY_PLAYED: return "LP";
+				case Grade::MODERATELY_PLAYED: return "MP";
+				case Grade::HEAVILY_PLAYED: return "HP";
+			}
+			return "error";
+		}();
+
+		//boolean
+		record[4] = it.foil ? "true" : "false";
+
+		//integer
+		char buf[16];
+		sprintf(buf, "%d", it.count);
+		record[5] = buf;
+
+		obj.push_back(record);
+	}
+
+	return obj;
+}
+
+CSVObject<6> writeDeckboxCSV(std::list<CardEntry> cardList) {
 	//
+}
 
-	CSVObject<6> obj2 = writeCardbaseCSV(cardList);
-	writeCSV<6>("dump.csv", obj2, ';');
+std::list<std::string> writePucatrade(std::list<CardEntry> cardList) {
+	//
+}
 
-	return 0;
+std::list<std::string> writeTappedoutDEK(std::list<CardEntry> cardList) {
+	//
 }

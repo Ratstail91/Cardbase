@@ -3,10 +3,8 @@
 #include <map>
 #include <string>
  
-typedef std::map<std::string, std::string> table_t;
-
 //DOCS: some sets may be missing, or this may be out of date
-constexpr table_t conversions = {
+const std::map<std::string, std::string> conversions = {
 	//core sets
 	{"(LEA)", "Limited Edition Alpha"},
 	{"(LEB)", "Limited Edition Beta"},

@@ -1,4 +1,4 @@
-Move along, nothing to see here.
+A Magic: The Gathering card manager, written for personal use.
 
 ## Formats Supported
 

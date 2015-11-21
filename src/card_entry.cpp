@@ -21,23 +21,25 @@
 */
 #include "card_entry.hpp"
 
+#include <iostream>
+
 bool operator<(CardEntry const& lhs, CardEntry const& rhs) {
 	//check name
 	int cmp = lhs.name.compare(rhs.name);
-	if (cmp >= 0) {
-		return false;
+	if (cmp != 0) {
+		return cmp < 0;
 	}
 
 	//check code
 	cmp = lhs.code.compare(rhs.code);
-	if (cmp >= 0) {
-		return false;
+	if (cmp != 0) {
+		return cmp < 0;
 	}
 
 	//check language
 	cmp = lhs.language.compare(rhs.language);
-	if (cmp >= 0) {
-		return false;
+	if (cmp != 0) {
+		return cmp < 0;
 	}
 
 	//non-foil before foil
@@ -45,7 +47,7 @@ bool operator<(CardEntry const& lhs, CardEntry const& rhs) {
 		return rhs.foil;
 	}
 
-	//lower grade value before higher
+	//lower grade value before higher (mint = 1, etc.)
 	if (lhs.grade != rhs.grade) {
 		return lhs.grade < rhs.grade;
 	}

@@ -33,7 +33,7 @@ enum Grade {
 	LIGHTLY_PLAYED = 3,
 	MODERATELY_PLAYED = 4,
 	HEAVILY_PLAYED = 5,
-	ERROR = 99
+	GRADE_ERROR = 99
 };
 
 struct CardEntry {

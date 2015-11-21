@@ -55,26 +55,26 @@ int help(int argc, char* argv[]) {
 }
 
 enum Format {
-	CARDBASE,
-	DECKBOX,
-	PUCATRADE,
-	TAPPEDOUT,
+	CARDBASE = 1,
+	DECKBOX = 2,
+	PUCATRADE = 3,
+	TAPPEDOUT = 4,
 
 	FORMAT_ERROR
 };
 
 Format toFormat(const char* str) {
 	//parse the input
-	if (stricmp(str, "cardbase")) {
+	if (!stricmp(str, "cardbase")) {
 		return Format::CARDBASE;
 	}
-	if (stricmp(str, "deckbox")) {
+	if (!stricmp(str, "deckbox")) {
 		return Format::DECKBOX;
 	}
-	if (stricmp(str, "pucatrade")) {
+	if (!stricmp(str, "pucatrade")) {
 		return Format::PUCATRADE;
 	}
-	if (stricmp(str, "tappedout")) {
+	if (!stricmp(str, "tappedout")) {
 		return Format::TAPPEDOUT;
 	}
 	return Format::FORMAT_ERROR;
@@ -100,6 +100,9 @@ int main(int argc, char* argv[]) {
 		std::cout << "Unknown OFORMAT" << std::endl;
 		return 1;
 	}
+
+	//DEBUG
+	std::cout << "Formats: (" << inputFormat << ", " << outputFormat << ")" << std::endl;
 
 	try {
 		//get the rares list

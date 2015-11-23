@@ -20,7 +20,10 @@
  * distribution.
 */
 #include "formats.hpp"
+#include "set_codes.hpp"
+#include "utils.hpp"
 
+#include <cstdlib>
 #include <sstream>
 
 CSVObject<6> writeCardbaseCSV(std::list<CardEntry> cardList) {
@@ -61,7 +64,73 @@ CSVObject<6> writeCardbaseCSV(std::list<CardEntry> cardList) {
 }
 
 CSVObject<6> writeDeckboxCSV(std::list<CardEntry> cardList) {
-	//TODO: EMPTY
+		CSVObject<6> obj;
+		CSVElement<6> header;
+
+		//build & insert the header record
+		header[0] = "Count";
+		header[1] = "Name";
+		header[2] = "Foil";
+		header[3] = "Edition";
+		header[4] = "Condition";
+		header[5] = "Language";
+
+		obj.push_back(header);
+
+	for (auto& it : cardList) {
+		CSVElement<6> record;
+
+		//count, name
+		char countBuffer[16];
+		sprintf(countBuffer, "%d", it.count);
+		record[0] = countBuffer;
+		record[1] = pushQuotes(it.name);
+
+		//foil
+		if (it.foil) {
+			record[2] = "foil";
+		}
+
+		//edition
+		for (auto& set : setCodes) {
+			if (set.first == it.code) {
+				record[3] = set.second;
+			}
+		}
+		if (record[3].size() == 0) {
+			//not found
+			record[3] = setCodes.at("000");
+		}
+
+		//condition
+		switch(it.grade) {
+			case Grade::MINT:
+				record[4] = "Mint";
+			break;
+			case Grade::NEAR_MINT:
+				record[4] = "Near Mint";
+			break;
+			case Grade::LIGHTLY_PLAYED:
+				record[4] = "Good (Lightly Played)";
+			break;
+			case Grade::MODERATELY_PLAYED:
+				record[4] = "Played";
+			break;
+			case Grade::HEAVILY_PLAYED:
+				record[4] = "Heavily Played";
+			break;
+			case Grade::GRADE_ERROR:
+				record[4] = "Poor";
+			break;
+		}
+
+		//language
+		record[5] = it.language;
+
+		obj.push_back(record);
+	}
+
+	return obj;
 }
 
 std::list<std::string> writePucatrade(std::list<CardEntry> cardList) {

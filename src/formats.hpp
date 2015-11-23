@@ -27,26 +27,7 @@
 #include <list>
 #include <string>
 
-/* DOCS: Format access
-
-cardbase.csv:
-	CSVObject<6> obj1 = readCSV<6>("cardbase.csv", ';');
-	std::list<CardEntry> cardList = readCardbaseCSV(obj1);
-
-	CSVObject<6> obj2 = writeCardbaseCSV(cardList);
-	writeCSV<6>("dump.csv", obj2, ';');
-
-deckbox.csv:
-	CSVObject<6> obj = readCSV<6, ';'>("deckbox.csv");
-	std::list<CardEntry> cardList = readDeckboxCSV(obj);
-
-pucatrade:
-	//
-
-tappedout.dek:
-	//
-
-*/
+//DOCS: Format access; these functions convert list<cardEntry> to and from various other data structures based on format
 
 //read
 std::list<CardEntry> readCardbaseCSV(CSVObject<6> obj);

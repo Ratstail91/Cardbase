@@ -34,7 +34,7 @@
 #include <string>
 
 int usage(int argc, char* argv[]) {
-	std::cout << "Usage: " << argv[0] << " FILE IFORMAT OFORMAT" << std::endl;
+	std::cout << "Usage: " << argv[0] << " INFILE OUTFILE INFORMAT OUTFORMAT" << std::endl;
 	std::cout << "Type \"" << argv[0] << " help\" for more info" << std::endl;
 	return 0;
 }
@@ -42,10 +42,11 @@ int usage(int argc, char* argv[]) {
 int help(int argc, char* argv[]) {
 	//TODO: iomanip
 	//print the help information
-	std::cout << "Usage: " << argv[0] << " FILE IFORMAT OFORMAT" << std::endl;
-	std::cout << "\tFILE\t\t- The name of the input file" << std::endl;
-	std::cout << "\tIFORMAT\t\t- The input file's format" << std::endl;
-	std::cout << "\tOFORMAT\t\t- The output file's format" << std::endl;
+	std::cout << "Usage: " << argv[0] << " INFILE OUTFILE INFORMAT OUTFORMAT" << std::endl;
+	std::cout << "\tINFILE\t\t- The name of the input file" << std::endl;
+	std::cout << "\tOUTFILE\t\t- The name of the output file" << std::endl;
+	std::cout << "\tINFORMAT\t\t- The input file's format" << std::endl;
+	std::cout << "\tOUTFORMAT\t\t- The output file's format" << std::endl;
 	std::cout << "Valid formats are:" << std::endl;
 	std::cout << "\tCardbase\t- Cardbase standard CSV format" << std::endl;
 	std::cout << "\tDeckbox\t\t- Deckbox.org standard CSV format" << std::endl;
@@ -80,24 +81,44 @@ Format toFormat(const char* str) {
 	return Format::FORMAT_ERROR;
 }
 
+void writeStringList(std::string fname, std::list<std::string> stringList) {
+	//basic file output for a list of strings
+	std::ofstream os(fname);
+
+	//error check
+	if (!os.is_open()) {
+		std::ostringstream msg;
+		msg << "Failed to open file: " << fname;
+		throw(std::runtime_error(msg.str()));
+	}
+
+	//for each
+	for (auto& it : stringList) {
+		os << it << std::endl;
+	}
+
+	//finally
+	os.close();
+}
+
 int main(int argc, char* argv[]) {
-	if (argc != 4) {
+	if (argc != 5) {
 		if (argc == 2 && !stricmp(argv[1], "help")) {
 			return help(argc, argv);
 		}
 		return usage(argc, argv);
 	}
 
-	Format inputFormat = toFormat(argv[2]);
-	Format outputFormat = toFormat(argv[3]);
+	Format inputFormat = toFormat(argv[3]);
+	Format outputFormat = toFormat(argv[4]);
 
 	if (inputFormat == Format::FORMAT_ERROR) {
-		std::cout << "Unknown IFORMAT" << std::endl;
+		std::cout << "Unknown INFORMAT" << std::endl;
 		return 1;
 	}
 
 	if (outputFormat == Format::FORMAT_ERROR) {
-		std::cout << "Unknown OFORMAT" << std::endl;
+		std::cout << "Unknown OUTFORMAT" << std::endl;
 		return 1;
 	}
 
@@ -105,6 +126,9 @@ int main(int argc, char* argv[]) {
 	std::cout << "Formats: (" << inputFormat << ", " << outputFormat << ")" << std::endl;
 
 	try {
+		//database
+		nlohmann::json allCardsX = loadjson("rsc/AllCards-x.json");
+
 		//get the rares list
 		std::list<CardEntry> cardList;
 
@@ -127,17 +151,27 @@ int main(int argc, char* argv[]) {
 			break;
 		}
 
-		//database
-		nlohmann::json allCardsX = loadjson("rsc/AllCards-x.json");
-
 		//verify the card list
 		int errors = verifyCardList(cardList, allCardsX);
 
 		std::cout << "Number of verification errors: " << errors << std::endl;
 
-		//DEBUG: dump card list
-		for (auto& it : cardList) {
-			std::cout << it.name << std::endl;
+		//write the output file
+		switch(outputFormat) {
+			case Format::CARDBASE:
+				writeCSV<6>(argv[2], writeCardbaseCSV(cardList), ';');
+			break;
+			case Format::DECKBOX:
+				writeCSV<6>(argv[2], writeDeckboxCSV(cardList), ',');
+			break;
+			case Format::PUCATRADE:
+				//TODO: read pucatrade
+				std::cout << "Sorry, but this feature is incomplete" << std::endl;
+				return 2;
+			break;
+			case Format::TAPPEDOUT:
+				writeStringList(argv[2],writeTappedoutDEK(cardList));
+			break;
 		}
 	}
 	catch (std::exception& e) {

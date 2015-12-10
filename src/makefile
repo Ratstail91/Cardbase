@@ -10,7 +10,7 @@ endif
 LIBS+=
 
 #flags
-CXXFLAGS+=-std=c++11 $(addprefix -I,$(INCLUDES))
+CXXFLAGS+=-std=gnu++11 $(addprefix -I,$(INCLUDES))
 
 #source
 CXXSRC=$(wildcard *.cpp)

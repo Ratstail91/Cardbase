@@ -1,7 +1,7 @@
 #Windows 7:
 #RM=del /y
 
-#Windows 8.1:
+#Windows 8.1, 10:
 #RM=del /S
 
 OUTDIR=out
@@ -18,7 +18,7 @@ $(OUTDIR):
 
 clean:
 ifeq ($(OS),Windows_NT)
-	$(RM) *.o *.a *.exe
+	del /S *.o *.a *.exe
 else ifeq ($(shell uname), Linux)
 	find . -type f -name '*.o' -exec rm -f -r -v {} \;
 	find . -type f -name '*.a' -exec rm -f -r -v {} \;

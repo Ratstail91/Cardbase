@@ -33,6 +33,6 @@ std::string popQuotes(std::string s);
 nlohmann::json loadjson(std::string str);
 int verifyCardList(std::list<CardEntry> cardList, nlohmann::json allCardsX);
 
-#ifndef stricmp
-#define stricmp(i, j) strcasecmp(i, j)
-#endif
+//#ifndef stricmp
+//#define stricmp(i, j) strcasecmp(i, j)
+//#endif

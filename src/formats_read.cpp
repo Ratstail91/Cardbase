@@ -24,6 +24,8 @@
 
 #include <cstdlib>
 #include <cstring>
+#include <iostream>
+#include <stdexcept>
 
 std::list<CardEntry> readCardbaseCSV(CSVObject<6> obj) {
 	std::list<CardEntry> cardList;
@@ -82,6 +84,30 @@ std::list<CardEntry> readPucatrade(std::list<std::string>) {
 	//TODO: EMPTY
 }
 
-std::list<CardEntry> readTappedoutDEK(std::list<std::string>) {
-	//TODO: EMPTY
+std::list<CardEntry> readTappedoutDEK(std::list<std::string> stringList) {
+	std::list<CardEntry> cardList;
+
+	for (auto& it : stringList) {
+		CardEntry entry;
+		char nameBuffer[512], codeBuffer[512];
+		memset(nameBuffer, 0, 512);
+		memset(codeBuffer, 0, 512);
+
+		//read entry
+		int r = sscanf(it.c_str(), "%dx %[^(](%[^)])", &entry.count, nameBuffer, codeBuffer);
+
+		if (r != 3) {
+			std::ostringstream msg;
+			msg << "Failed to read a card: " << it;
+			throw(std::runtime_error(msg.str()));
+		}
+
+		entry.name = pruneSpace(nameBuffer);
+		entry.code = codeBuffer;
+
+		//finally
+		cardList.push_back(entry);
+	}
+
+	return cardList;
 }

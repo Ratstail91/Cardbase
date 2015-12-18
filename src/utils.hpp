@@ -30,6 +30,7 @@
 
 std::string pushQuotes(std::string s);
 std::string popQuotes(std::string s);
+std::string pruneSpace(std::string s);
 nlohmann::json loadjson(std::string str);
 int verifyCardList(std::list<CardEntry> cardList, nlohmann::json allCardsX);
 

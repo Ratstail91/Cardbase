@@ -81,6 +81,32 @@ Format toFormat(const char* str) {
 	return Format::FORMAT_ERROR;
 }
 
+std::list<std::string> readStringList(std::string fname) {
+	//return object
+	std::list<std::string> stringList;
+
+	//open the file
+	std::ifstream is(fname);
+
+	if (!is.is_open()) {
+		std::ostringstream msg;
+		msg << "Failed to open file: " << fname;
+		throw(std::runtime_error(msg.str()));
+	}
+
+	//for each
+	while (!is.eof()) {
+		std::string line;
+		getline(is, line);
+		if (line.size() != 0) {
+			stringList.push_back(line);
+		}
+	}
+
+	//finally
+	return stringList;
+}
+
 void writeStringList(std::string fname, std::list<std::string> stringList) {
 	//basic file output for a list of strings
 	std::ofstream os(fname);
@@ -136,19 +162,17 @@ int main(int argc, char* argv[]) {
 			case Format::CARDBASE:
 				cardList = readCardbaseCSV(readCSV<6>(argv[1], ';'));
 			break;
-			case Format::DECKBOX:
-				//TODO: read deckbox.dek
-//			break;
-			case Format::PUCATRADE:
-				//TODO: read pucatrade
-//			break;
 			case Format::TAPPEDOUT:
-				//TODO: read tappedout
+				cardList = readTappedoutDEK(readStringList(argv[1]));
+			break;
 
-				//DEBUG: implementation warning
+			//TODO: read deckbox.dek
+			case Format::DECKBOX:
+			//TODO: read pucatrade
+			case Format::PUCATRADE:
+			default:
 				std::cout << "Sorry, but this feature is incomplete" << std::endl;
 				return 2;
-			break;
 		}
 
 		//verify the card list
@@ -164,14 +188,15 @@ int main(int argc, char* argv[]) {
 			case Format::DECKBOX:
 				writeCSV<6>(argv[2], writeDeckboxCSV(cardList), ',');
 			break;
-			case Format::PUCATRADE:
-				//TODO: read pucatrade
-				std::cout << "Sorry, but this feature is incomplete" << std::endl;
-				return 2;
-			break;
 			case Format::TAPPEDOUT:
 				writeStringList(argv[2],writeTappedoutDEK(cardList));
 			break;
+
+			//TODO: pucatrade ouput
+			case Format::PUCATRADE:
+			default:
+				std::cout << "Sorry, but this feature is incomplete" << std::endl;
+				return 2;
 		}
 	}
 	catch (std::exception& e) {

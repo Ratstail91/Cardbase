@@ -21,6 +21,7 @@
 */
 #include "utils.hpp"
 
+#include <cctype>
 #include <fstream>
 #include <iostream>
 
@@ -36,6 +37,20 @@ std::string popQuotes(std::string s) {
 	}
 
 	return s.substr(1, s.size()-2);
+}
+
+std::string pruneSpace(std::string s) {
+	//prune front
+	while (s.size() && isspace(s[0])) {
+		s = s.substr(1);
+	}
+
+	//prune back
+	while (s.size() && isspace(s[ s.size()-1 ])) {
+		s = s.substr(0, s.size()-1);
+	}
+
+	return s;
 }
 
 nlohmann::json loadjson(std::string str) {

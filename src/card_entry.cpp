@@ -55,3 +55,7 @@ bool operator<(CardEntry const& lhs, CardEntry const& rhs) {
 	//entries are identical, except for count
 	return false;
 }
+
+bool operator==(CardEntry const& lhs, CardEntry const& rhs) {
+	return !(lhs < rhs) && !(rhs < lhs);
+}

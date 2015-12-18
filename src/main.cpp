@@ -30,7 +30,6 @@
 #include <iomanip>
 #include <iostream>
 #include <list>
-#include <stdexcept>
 #include <string>
 
 int usage(int argc, char* argv[]) {
@@ -81,50 +80,29 @@ Format toFormat(const char* str) {
 	return Format::FORMAT_ERROR;
 }
 
-std::list<std::string> readStringList(std::string fname) {
-	//return object
-	std::list<std::string> stringList;
+//collapse duplicate entries
+void collapseList(std::list<CardEntry>& cardList) {
+	std::list<CardEntry>::iterator it = cardList.begin();
 
-	//open the file
-	std::ifstream is(fname);
+	while (it != cardList.end()) {
+		std::list<CardEntry>::iterator next = it;
+		next++; //point to the next iterator
 
-	if (!is.is_open()) {
-		std::ostringstream msg;
-		msg << "Failed to open file: " << fname;
-		throw(std::runtime_error(msg.str()));
-	}
-
-	//for each
-	while (!is.eof()) {
-		std::string line;
-		getline(is, line);
-		if (line.size() != 0) {
-			stringList.push_back(line);
+		//done
+		if (next == cardList.end()) {
+			break;
 		}
+
+		//add identical neighbours
+		if (*it == *next) {
+			it->count += next->count;
+			cardList.erase(next);
+			continue;
+		}
+
+		//move on
+		it++;
 	}
-
-	//finally
-	return stringList;
-}
-
-void writeStringList(std::string fname, std::list<std::string> stringList) {
-	//basic file output for a list of strings
-	std::ofstream os(fname);
-
-	//error check
-	if (!os.is_open()) {
-		std::ostringstream msg;
-		msg << "Failed to open file: " << fname;
-		throw(std::runtime_error(msg.str()));
-	}
-
-	//for each
-	for (auto& it : stringList) {
-		os << it << std::endl;
-	}
-
-	//finally
-	os.close();
 }
 
 int main(int argc, char* argv[]) {
@@ -177,6 +155,10 @@ int main(int argc, char* argv[]) {
 
 		//verify the card list
 		int errors = verifyCardList(cardList, allCardsX);
+
+		//sort & collapse the card list
+		cardList.sort();
+		collapseList(cardList);
 
 		std::cout << "Number of verification errors: " << errors << std::endl;
 

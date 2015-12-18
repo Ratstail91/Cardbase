@@ -32,6 +32,8 @@ std::string pushQuotes(std::string s);
 std::string popQuotes(std::string s);
 std::string pruneSpace(std::string s);
 nlohmann::json loadjson(std::string str);
+std::list<std::string> readStringList(std::string fname);
+void writeStringList(std::string fname, std::list<std::string> stringList);
 int verifyCardList(std::list<CardEntry> cardList, nlohmann::json allCardsX);
 
 //#ifndef stricmp

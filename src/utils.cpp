@@ -24,6 +24,7 @@
 #include <cctype>
 #include <fstream>
 #include <iostream>
+#include <stdexcept>
 
 std::string pushQuotes(std::string s) {
 	//add quote characters at the beginning & end of the string
@@ -68,6 +69,52 @@ nlohmann::json loadjson(std::string str) {
 	is.close();
 
 	return ret;
+}
+
+std::list<std::string> readStringList(std::string fname) {
+	//return object
+	std::list<std::string> stringList;
+
+	//open the file
+	std::ifstream is(fname);
+
+	if (!is.is_open()) {
+		std::ostringstream msg;
+		msg << "Failed to open file: " << fname;
+		throw(std::runtime_error(msg.str()));
+	}
+
+	//for each
+	while (!is.eof()) {
+		std::string line;
+		getline(is, line);
+		if (line.size() != 0) {
+			stringList.push_back(line);
+		}
+	}
+
+	//finally
+	return stringList;
+}
+
+void writeStringList(std::string fname, std::list<std::string> stringList) {
+	//basic file output for a list of strings
+	std::ofstream os(fname);
+
+	//error check
+	if (!os.is_open()) {
+		std::ostringstream msg;
+		msg << "Failed to open file: " << fname;
+		throw(std::runtime_error(msg.str()));
+	}
+
+	//for each
+	for (auto& it : stringList) {
+		os << it << std::endl;
+	}
+
+	//finally
+	os.close();
 }
 
 int verifyCardList(std::list<CardEntry> cardList, nlohmann::json allCardsX) {

@@ -59,3 +59,4 @@ struct CardEntry {
 
 //return lhs < rhs
 bool operator<(CardEntry const& lhs, CardEntry const& rhs);
+bool operator==(CardEntry const& lhs, CardEntry const& rhs);

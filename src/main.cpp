@@ -100,9 +100,9 @@ int main(int argc, char* argv[]) {
 	}
 
 	//asking for conversion
-//	if (!stricmp(argv[1], "convert")) {
-//		return convert(argc, argv);
-//	}
+	if (!stricmp(argv[1], convertHelp("command", argc, argv).c_str() )) {
+		return convert(argc, argv);
+	}
 
 	std::cout << "Unknown command" << std::endl;
 	std::cout << "Type \"" << argv[0] << " help\" for more information" << std::endl;

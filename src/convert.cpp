@@ -69,8 +69,9 @@ std::string convertHelp(const char* mode, int argc, char* argv[]) {
 enum Format {
 	CARDBASE = 1,
 	DECKBOX = 2,
-	PUCATRADE = 3,
-	TAPPEDOUT = 4,
+	MTGO = 3,
+	PUCATRADE = 4,
+	TAPPEDOUT = 5,
 
 	FORMAT_ERROR
 };
@@ -84,6 +85,9 @@ Format toFormat(const char* str) {
 	if (!stricmp(str, "deckbox")) {
 		return Format::DECKBOX;
 	}
+	if (!stricmp(str, "mtgo")) {
+		return Format::MTGO;
+	}
 	if (!stricmp(str, "pucatrade")) {
 		return Format::PUCATRADE;
 	}
@@ -96,16 +100,16 @@ Format toFormat(const char* str) {
 //args: argv[0] convert inlist outlist informat outformat
 int convert(int argc, char* argv[]) {
 	//get the formats
-	Format inputFormat = toFormat(argv[5]);
-	Format outputFormat = toFormat(argv[6]);
+	Format inputFormat = toFormat(argv[4]);
+	Format outputFormat = toFormat(argv[5]);
 
 	if (inputFormat == Format::FORMAT_ERROR) {
-		std::cout << "Unknown INFORMAT" << std::endl;
+		std::cout << "Unknown input_format" << std::endl;
 		return 1;
 	}
 
 	if (outputFormat == Format::FORMAT_ERROR) {
-		std::cout << "Unknown OUTFORMAT" << std::endl;
+		std::cout << "Unknown output_format" << std::endl;
 		return 1;
 	}
 
@@ -116,19 +120,21 @@ int convert(int argc, char* argv[]) {
 		//database
 		nlohmann::json allCardsX = loadjson("rsc/AllCards-x.json");
 
-		//get the rares list
+		//internal card list
 		std::list<CardEntry> cardList;
 
 		switch(inputFormat) {
 			case Format::CARDBASE:
-				cardList = readCardbaseCSV(readCSV<6>(argv[1], ';'));
+				cardList = readCardbaseCSV(readCSV<6>(argv[2], ';'));
 			break;
 			case Format::TAPPEDOUT:
-				cardList = readTappedoutDEK(readStringList(argv[1]));
+				cardList = readTappedoutDEK(readStringList(argv[2]));
 			break;
 
 			//TODO: read deckbox.dek
 			case Format::DECKBOX:
+			//TODO: read MTGO.dek
+			case Format::MTGO:
 			//TODO: read pucatrade
 			case Format::PUCATRADE:
 			default:
@@ -148,16 +154,18 @@ int convert(int argc, char* argv[]) {
 		//write the output file
 		switch(outputFormat) {
 			case Format::CARDBASE:
-				writeCSV<6>(argv[2], writeCardbaseCSV(cardList), ';');
+				writeCSV<6>(argv[3], writeCardbaseCSV(cardList), ';');
 			break;
 			case Format::DECKBOX:
-				writeCSV<6>(argv[2], writeDeckboxCSV(cardList), ',');
+				writeCSV<6>(argv[3], writeDeckboxCSV(cardList), ',');
 			break;
 			case Format::TAPPEDOUT:
-				writeStringList(argv[2],writeTappedoutDEK(cardList));
+				writeStringList(argv[3],writeTappedoutDEK(cardList));
 			break;
 
-			//TODO: pucatrade ouput
+			//TODO: write MTGO.dek
+			case Format::MTGO:
+			//TODO: write pucatrade
 			case Format::PUCATRADE:
 			default:
 				std::cout << "Sorry, but this feature is incomplete" << std::endl;

@@ -19,172 +19,93 @@
  * 3. This notice may not be removed or altered from any source
  * distribution.
 */
-#include "card_entry.hpp"
-#include "csv_tool.hpp"
-#include "formats.hpp"
-#include "json.hpp"
-#include "set_codes.hpp"
-#include "utils.hpp"
+#include "convert.hpp"
 
 #include <algorithm>
+#include <cstring>
 #include <iomanip>
 #include <iostream>
-#include <list>
-#include <string>
 
 int usage(int argc, char* argv[]) {
-	std::cout << "Usage: " << argv[0] << " INFILE OUTFILE INFORMAT OUTFORMAT" << std::endl;
-	std::cout << "Type \"" << argv[0] << " help\" for more info" << std::endl;
+	std::cout << "Usage: " << argv[0] << " COMMAND" << std::endl;
+	std::cout << "Type \"" << argv[0] << " help\" for more information" << std::endl;
 	return 0;
+}
+
+int about(int argc, char* argv[]) {
+	//copyright
+	std::cout << "Cardbase (c) Kayne Ruse 2015-2016" << std::endl;
+	std::cout << "https://www.github.com/Ratstail91/Cardbase" << std::endl;
+	std::cout << "Type \"" << argv[0] << " help\" for more information" << std::endl;
 }
 
 int help(int argc, char* argv[]) {
-	//TODO: iomanip
-	//print the help information
-	std::cout << "Usage: " << argv[0] << " INFILE OUTFILE INFORMAT OUTFORMAT" << std::endl;
-	std::cout << "\tINFILE\t\t- The name of the input file" << std::endl;
-	std::cout << "\tOUTFILE\t\t- The name of the output file" << std::endl;
-	std::cout << "\tINFORMAT\t\t- The input file's format" << std::endl;
-	std::cout << "\tOUTFORMAT\t\t- The output file's format" << std::endl;
-	std::cout << "Valid formats are:" << std::endl;
-	std::cout << "\tCardbase\t- Cardbase standard CSV format" << std::endl;
-	std::cout << "\tDeckbox\t\t- Deckbox.org standard CSV format" << std::endl;
-	std::cout << "\tPucatrade\t- Pucatrade.com importer format" << std::endl;
-	std::cout << "\tTappedout\t- Tappedout.net decklist format" << std::endl;
+	if (argc == 2) {
+		//print the help information
+		std::cout << "Usage: " << argv[0] << " COMMAND" << std::endl;
+		std::cout << "Available options are:" << std::endl;
+
+		//about
+		std::cout << std::left << std::setw(15) << "ABOUT";
+		std::cout << std::left << "Show copyright information" << std::endl;
+
+		//help
+		std::cout << std::left << std::setw(15) << "HELP";
+		std::cout << std::left << "Show this help message" << std::endl;
+
+		//convert between file formats
+		std::cout << std::left << std::setw(15) << convertHelp("command", argc, argv);
+		std::cout << std::left << convertHelp("shorthelp", argc, argv) << std::endl;
+
+		//list all known versions of a card
+//		std::cout << std::left << std::setw(15) << "list";
+//		std::cout << std::left << "List all printings of a card (incomplete)" << std::endl;
+
+		//list all known versions of a card
+//		std::cout << std::left << std::setw(15) << "list";
+//		std::cout << std::left << "List all printings of a card (incomplete)" << std::endl;
+
+		//list all known versions of a card
+//		std::cout << std::left << std::setw(15) << "legality";
+//		std::cout << std::left << "Lheck the legality of a card or decklist (incomplete)" << std::endl;
+
+		//for more information...
+		std::cout << "For more information about a specific command, type ";
+		std::cout << argv[0] << " HELP COMMAND" << std::endl;
+	}
+	else {
+		//specific command
+		if ( !stricmp(argv[2], convertHelp("command", argc, argv).c_str()) ) {
+			std::cout << convertHelp("longhelp", argc, argv) << std::endl;
+		}
+	}
+
 	return 0;
 }
 
-enum Format {
-	CARDBASE = 1,
-	DECKBOX = 2,
-	PUCATRADE = 3,
-	TAPPEDOUT = 4,
-
-	FORMAT_ERROR
-};
-
-Format toFormat(const char* str) {
-	//parse the input
-	if (!stricmp(str, "cardbase")) {
-		return Format::CARDBASE;
-	}
-	if (!stricmp(str, "deckbox")) {
-		return Format::DECKBOX;
-	}
-	if (!stricmp(str, "pucatrade")) {
-		return Format::PUCATRADE;
-	}
-	if (!stricmp(str, "tappedout")) {
-		return Format::TAPPEDOUT;
-	}
-	return Format::FORMAT_ERROR;
-}
-
-//collapse duplicate entries
-void collapseList(std::list<CardEntry>& cardList) {
-	std::list<CardEntry>::iterator it = cardList.begin();
-
-	while (it != cardList.end()) {
-		std::list<CardEntry>::iterator next = it;
-		next++; //point to the next iterator
-
-		//done
-		if (next == cardList.end()) {
-			break;
-		}
-
-		//add identical neighbours
-		if (*it == *next) {
-			it->count += next->count;
-			cardList.erase(next);
-			continue;
-		}
-
-		//move on
-		it++;
-	}
-}
-
 int main(int argc, char* argv[]) {
-	if (argc != 5) {
-		if (argc == 2 && !stricmp(argv[1], "help")) {
-			return help(argc, argv);
-		}
+	//no args
+	if (argc == 1) {
 		return usage(argc, argv);
 	}
 
-	Format inputFormat = toFormat(argv[3]);
-	Format outputFormat = toFormat(argv[4]);
-
-	if (inputFormat == Format::FORMAT_ERROR) {
-		std::cout << "Unknown INFORMAT" << std::endl;
-		return 1;
+	//asking for info
+	if (!stricmp(argv[1], "about")) {
+		return about(argc, argv);
 	}
 
-	if (outputFormat == Format::FORMAT_ERROR) {
-		std::cout << "Unknown OUTFORMAT" << std::endl;
-		return 1;
+	//asking for help
+	if (!stricmp(argv[1], "help")) {
+		return help(argc, argv);
 	}
 
-	//DEBUG
-	std::cout << "Formats: (" << inputFormat << ", " << outputFormat << ")" << std::endl;
+	//asking for conversion
+//	if (!stricmp(argv[1], "convert")) {
+//		return convert(argc, argv);
+//	}
 
-	try {
-		//database
-		nlohmann::json allCardsX = loadjson("rsc/AllCards-x.json");
-
-		//get the rares list
-		std::list<CardEntry> cardList;
-
-		switch(inputFormat) {
-			case Format::CARDBASE:
-				cardList = readCardbaseCSV(readCSV<6>(argv[1], ';'));
-			break;
-			case Format::TAPPEDOUT:
-				cardList = readTappedoutDEK(readStringList(argv[1]));
-			break;
-
-			//TODO: read deckbox.dek
-			case Format::DECKBOX:
-			//TODO: read pucatrade
-			case Format::PUCATRADE:
-			default:
-				std::cout << "Sorry, but this feature is incomplete" << std::endl;
-				return 2;
-		}
-
-		//verify the card list
-		int errors = verifyCardList(cardList, allCardsX);
-
-		//sort & collapse the card list
-		cardList.sort();
-		collapseList(cardList);
-
-		std::cout << "Number of verification errors: " << errors << std::endl;
-
-		//write the output file
-		switch(outputFormat) {
-			case Format::CARDBASE:
-				writeCSV<6>(argv[2], writeCardbaseCSV(cardList), ';');
-			break;
-			case Format::DECKBOX:
-				writeCSV<6>(argv[2], writeDeckboxCSV(cardList), ',');
-			break;
-			case Format::TAPPEDOUT:
-				writeStringList(argv[2],writeTappedoutDEK(cardList));
-			break;
-
-			//TODO: pucatrade ouput
-			case Format::PUCATRADE:
-			default:
-				std::cout << "Sorry, but this feature is incomplete" << std::endl;
-				return 2;
-		}
-	}
-	catch (std::exception& e) {
-		std::cerr << "Exception thrown: " << e.what() << std::endl;
-		return 1;
-	}
+	std::cout << "Unknown command" << std::endl;
+	std::cout << "Type \"" << argv[0] << " help\" for more information" << std::endl;
 
 	return 0;
 }

@@ -21,22 +21,8 @@
 */
 #pragma once
 
-#include "card_entry.hpp"
-#include "json.hpp"
-
-#include <cstring>
-#include <list>
 #include <string>
 
-std::string pushQuotes(std::string s);
-std::string popQuotes(std::string s);
-std::string pruneSpace(std::string s);
-nlohmann::json loadjson(std::string str);
-std::list<std::string> readStringList(std::string fname);
-void writeStringList(std::string fname, std::list<std::string> stringList);
-int verifyCardList(std::list<CardEntry> cardList, nlohmann::json allCardsX);
-void collapseList(std::list<CardEntry>& cardList);
-
-//#ifndef stricmp
-//#define stricmp(i, j) strcasecmp(i, j)
-//#endif
+//convert between file formats
+std::string convertHelp(const char* mode, int argc = 0, char* argv[] = nullptr);
+int convert(int argc, char* argv[]);

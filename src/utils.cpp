@@ -156,3 +156,28 @@ for_each_cardlist:
 
 	return errors;
 }
+
+//collapse duplicate entries
+void collapseList(std::list<CardEntry>& cardList) {
+	std::list<CardEntry>::iterator it = cardList.begin();
+
+	while (it != cardList.end()) {
+		std::list<CardEntry>::iterator next = it;
+		next++; //point to the next iterator
+
+		//done
+		if (next == cardList.end()) {
+			break;
+		}
+
+		//add identical neighbours
+		if (*it == *next) {
+			it->count += next->count;
+			cardList.erase(next);
+			continue;
+		}
+
+		//move on
+		it++;
+	}
+}

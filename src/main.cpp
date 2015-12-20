@@ -62,10 +62,6 @@ int help(int argc, char* argv[]) {
 //		std::cout << std::left << "List all printings of a card (incomplete)" << std::endl;
 
 		//list all known versions of a card
-//		std::cout << std::left << std::setw(15) << "list";
-//		std::cout << std::left << "List all printings of a card (incomplete)" << std::endl;
-
-		//list all known versions of a card
 //		std::cout << std::left << std::setw(15) << "legality";
 //		std::cout << std::left << "Lheck the legality of a card or decklist (incomplete)" << std::endl;
 

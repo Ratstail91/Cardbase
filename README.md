@@ -1,11 +1,6 @@
 A Magic: The Gathering card manager, written for personal use.
 
-## Formats Supported
-
-* Cardbase CSV
-* Deckbox CSV
-* Pucatrade Importer
-* Tappedout.dek
+FYI, this is a COMMAND LINE ONLY tool. I might write a front end eventually, IDK.
 
 ## External Dependencies
 

@@ -116,6 +116,7 @@ int convert(int argc, char* argv[]) {
 	//DEBUG
 	std::cout << "Formats: (" << inputFormat << ", " << outputFormat << ")" << std::endl;
 
+	//TODO: move this try/catch block
 	try {
 		//database
 		nlohmann::json allCardsX = loadjson("rsc/AllCards-x.json");

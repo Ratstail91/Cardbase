@@ -20,6 +20,7 @@
  * distribution.
 */
 #include "convert.hpp"
+#include "list.hpp" //TODO: (1) BAD NAME
 
 #include <algorithm>
 #include <cstring>
@@ -58,8 +59,8 @@ int help(int argc, char* argv[]) {
 		std::cout << std::left << convertHelp("shorthelp", argc, argv) << std::endl;
 
 		//list all known versions of a card
-//		std::cout << std::left << std::setw(15) << "list";
-//		std::cout << std::left << "List all printings of a card (incomplete)" << std::endl;
+		std::cout << std::left << std::setw(15) << listHelp("command", argc, argv);
+		std::cout << std::left << listHelp("shorthelp", argc, argv) << std::endl;
 
 		//list all known versions of a card
 //		std::cout << std::left << std::setw(15) << "legality";
@@ -73,6 +74,10 @@ int help(int argc, char* argv[]) {
 		//specific command
 		if ( !stricmp(argv[2], convertHelp("command", argc, argv).c_str()) ) {
 			std::cout << convertHelp("longhelp", argc, argv) << std::endl;
+		}
+
+		if ( !stricmp(argv[2], listHelp("command", argc, argv).c_str()) ) {
+			std::cout << listHelp("longhelp", argc, argv) << std::endl;
 		}
 	}
 
@@ -98,6 +103,11 @@ int main(int argc, char* argv[]) {
 	//asking for conversion
 	if (!stricmp(argv[1], convertHelp("command", argc, argv).c_str() )) {
 		return convert(argc, argv);
+	}
+
+	//asking for a list of printings
+	if (!stricmp(argv[1], listHelp("command", argc, argv).c_str() )) {
+		return list(argc, argv);
 	}
 
 	std::cout << "Unknown command" << std::endl;

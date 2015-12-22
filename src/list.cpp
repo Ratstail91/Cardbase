@@ -64,7 +64,7 @@ int list(int argc, char* argv[]) {
 	//database
 	//TODO: slow as f*ck, needs to load ~65MB into memory for this simple operation
 	nlohmann::json allCardsX = loadjson("rsc/AllCards-x.json");
-	nlohmann::json allSetsX = loadjson("rsc/allSets-X.json");
+	nlohmann::json allSetsX = loadjson("rsc/StrippedSets-x.json");
 
 	//check the spelling
 	if (allCardsX[argv[2]].is_null()) {

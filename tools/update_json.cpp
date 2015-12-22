@@ -21,14 +21,17 @@
 */
 #include "json.hpp"
 
+#include <fstream>
+#include <iostream>
+
 nlohmann::json loadjson(std::string str) {
 	//load a file into a json object
 	std::ifstream is(str);
 
 	if (!is.is_open()) {
-		std::ostringstream os;
-		os << "Failed to open file: " << str;
-		throw(std::runtime_error(os.str()));
+		std::ostringstream msg;
+		msg << "Failed to open file: " << str;
+		throw(std::runtime_error(msg.str()));
 	}
 
 	nlohmann::json ret;
@@ -38,16 +41,34 @@ nlohmann::json loadjson(std::string str) {
 	return ret;
 }
 
-int savejson(nlohmann::json json) {
+int savejson(nlohmann::json obj, std::string str) {
+	//save a json object into a file
+	std::ofstream os(str);
+
+	if (!os.is_open()) {
+		std::ostringstream msg;
+		msg << "Failed to open file: " << str;
+		throw(std::runtime_error(msg.str()));
+	}
+
+	os << obj;
+	os.close();
+
 	return 0;
 }
 
-int main(int, char**) {
-	nlohmann::json allSetsX = loadjson("rsc/allSets-X.json");
-	nlohmann::json allSetsSX;
+int main(int argc, char* argv[]) {
+	std::cout << "Beginning " << argv[0] << std::endl;
 
-	//TODO: incomplete
+	nlohmann::json allSetsX = loadjson("rsc/AllSets-X.json");
 
-	for ()
+	for (nlohmann::json::iterator set = allSetsX.begin(); set != allSetsX.end(); set++) {
+		set->erase("cards");
+	}
+
+	//dump
+	savejson(allSetsX, "rsc/StrippedSets-x.json");
+
+	std::cout << "Finished " << argv[0] << std::endl;
 	return 0;
 }

@@ -25,11 +25,18 @@ The mana symbols apparently have dimensions of 100px, separated by margins of 5p
 	* Name
 	* Set Code
 	* Language
+	* Condition
 	* Foil
 	* Count
-	* Condition
 * Commented lines are supported using hash symbols (#)
 * Blank lines are ignored
+
+## Other Supported Formats
+
+* Deckbox (read not implemented, write completed)
+* <s>MTGO</s>
+* <s>Pucatrade</s>
+* Tappedout (partial read, partial write)
 
 ## Copyright
 

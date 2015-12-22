@@ -84,6 +84,18 @@ std::list<CardEntry> readPucatrade(std::list<std::string>) {
 	//TODO: EMPTY
 }
 
+/* DOCS: here's the "official" tappedout.net spec as far as I can tell
+	In addition to these, they can be placed in any order on the line
+	This is gonna be hard as hell.
+
+	Any number to define the count
+	[XXX] XXX printing
+	*F* foil
+	*A* altered
+	*NM* condition (M = Mint, NM = Near Mint, SL = Slightly Played, P = Played)
+	*DE* different languages (https://en.wikipedia.org/wiki/ISO_3166-1, alpha-2)
+*/
+
 std::list<CardEntry> readTappedoutDEK(std::list<std::string> stringList) {
 	std::list<CardEntry> cardList;
 

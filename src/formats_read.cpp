@@ -77,14 +77,14 @@ std::list<CardEntry> readCardbaseCSV(CSVObject<6> obj) {
 }
 
 std::list<CardEntry> readDeckboxCSV(CSVObject<6> obj) {
-	//TODO: EMPTY
+	//TODO: readDeckboxCSV() empty
 }
 
 std::list<CardEntry> readPucatrade(std::list<std::string>) {
-	//TODO: EMPTY
+	//TODO: readPucatrade() empty
 }
 
-/* DOCS: here's the "official" tappedout.net spec as far as I can tell
+/* DOCS: here's the "official" tappedout.net spec as far as I can tell (read more)
 	In addition to these, they can be placed in any order on the line
 	This is gonna be hard as hell.
 
@@ -97,6 +97,7 @@ std::list<CardEntry> readPucatrade(std::list<std::string>) {
 */
 
 std::list<CardEntry> readTappedoutDEK(std::list<std::string> stringList) {
+	//TODO: readTappedoutDEK() incomplete
 	std::list<CardEntry> cardList;
 
 	for (auto& it : stringList) {

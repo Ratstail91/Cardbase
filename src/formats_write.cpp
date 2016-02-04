@@ -134,10 +134,11 @@ CSVObject<6> writeDeckboxCSV(std::list<CardEntry> cardList) {
 }
 
 std::list<std::string> writePucatrade(std::list<CardEntry> cardList) {
-	//TODO: EMPTY
+	//TODO: writePucatrade() empty
 }
 
 std::list<std::string> writeTappedoutDEK(std::list<CardEntry> cardList) {
+	//TODO: writeTappedoutDEK incomplete
 	std::list<std::string> ret;
 
 	for (auto& it : cardList) {

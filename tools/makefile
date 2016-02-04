@@ -21,7 +21,7 @@ OBJ+=$(addprefix $(OBJDIR)/,$(CXXSRC:.cpp=.o))
 
 #output
 #TODO: a better tools system
-OUTDIR=../out
+OUTDIR=.
 OUT=$(addprefix $(OUTDIR)/,update)
 
 #targets

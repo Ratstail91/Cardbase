@@ -116,65 +116,58 @@ int convert(int argc, char* argv[]) {
 	//DEBUG
 	std::cout << "Formats: (" << inputFormat << ", " << outputFormat << ")" << std::endl;
 
-	//TODO: move this try/catch block
-	try {
 		//database
 		nlohmann::json allCardsX = loadjson("rsc/AllCards-x.json");
 
 		//internal card list
 		std::list<CardEntry> cardList;
 
-		switch(inputFormat) {
-			case Format::CARDBASE:
-				cardList = readCardbaseCSV(readCSV<6>(argv[2], ';'));
-			break;
-			case Format::TAPPEDOUT:
-				cardList = readTappedoutDEK(readStringList(argv[2]));
-			break;
+	switch(inputFormat) {
+		case Format::CARDBASE:
+			cardList = readCardbaseCSV(readCSV<6>(argv[2], ';'));
+		break;
+		case Format::TAPPEDOUT:
+			cardList = readTappedoutDEK(readStringList(argv[2]));
+		break;
 
-			//TODO: read deckbox.dek
-			case Format::DECKBOX:
-			//TODO: read MTGO.dek
-			case Format::MTGO:
-			//TODO: read pucatrade
-			case Format::PUCATRADE:
-			default:
-				std::cout << "Sorry, but this feature is incomplete" << std::endl;
-				return 2;
-		}
-
-		//verify the card list
-		int errors = verifyCardList(cardList, allCardsX);
-
-		//sort & collapse the card list
-		cardList.sort();
-		collapseList(cardList);
-
-		std::cout << "Number of verification errors: " << errors << std::endl;
-
-		//write the output file
-		switch(outputFormat) {
-			case Format::CARDBASE:
-				writeCSV<6>(argv[3], writeCardbaseCSV(cardList), ';');
-			break;
-			case Format::DECKBOX:
-				writeCSV<6>(argv[3], writeDeckboxCSV(cardList), ',');
-			break;
-			case Format::TAPPEDOUT:
-				writeStringList(argv[3],writeTappedoutDEK(cardList));
-			break;
-
-			//TODO: write MTGO.dek
-			case Format::MTGO:
-			//TODO: write pucatrade
-			case Format::PUCATRADE:
-			default:
-				std::cout << "Sorry, but this feature is incomplete" << std::endl;
-				return 2;
-		}
+		//TODO: read deckbox.dek
+		case Format::DECKBOX:
+		//TODO: read MTGO.dek
+		case Format::MTGO:
+		//TODO: read pucatrade
+		case Format::PUCATRADE:
+		default:
+			std::cout << "Sorry, but this feature is incomplete" << std::endl;
+			return 2;
 	}
-	catch (std::exception& e) {
-		std::cerr << "Exception thrown: " << e.what() << std::endl;
-		return 1;
+
+	//verify the card list
+	int errors = verifyCardList(cardList, allCardsX);
+
+	//sort & collapse the card list
+	cardList.sort();
+	collapseList(cardList);
+
+	std::cout << "Number of verification errors: " << errors << std::endl;
+
+	//write the output file
+	switch(outputFormat) {
+		case Format::CARDBASE:
+			writeCSV<6>(argv[3], writeCardbaseCSV(cardList), ';');
+		break;
+		case Format::DECKBOX:
+			writeCSV<6>(argv[3], writeDeckboxCSV(cardList), ',');
+		break;
+		case Format::TAPPEDOUT:
+			writeStringList(argv[3],writeTappedoutDEK(cardList));
+		break;
+
+		//TODO: write MTGO.dek
+		case Format::MTGO:
+		//TODO: write pucatrade
+		case Format::PUCATRADE:
+		default:
+			std::cout << "Sorry, but this feature is incomplete" << std::endl;
+			return 2;
 	}
 }

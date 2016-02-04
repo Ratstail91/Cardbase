@@ -62,7 +62,7 @@ int help(int argc, char* argv[]) {
 		std::cout << std::left << std::setw(15) << listHelp("command", argc, argv);
 		std::cout << std::left << listHelp("shorthelp", argc, argv) << std::endl;
 
-		//list all known versions of a card
+		//list the legalities of a card/deck list
 //		std::cout << std::left << std::setw(15) << "legality";
 //		std::cout << std::left << "Lheck the legality of a card or decklist (incomplete)" << std::endl;
 
@@ -100,14 +100,20 @@ int main(int argc, char* argv[]) {
 		return help(argc, argv);
 	}
 
-	//asking for conversion
-	if (!stricmp(argv[1], convertHelp("command", argc, argv).c_str() )) {
-		return convert(argc, argv);
-	}
+	try {
+		//asking for conversion
+		if (!stricmp(argv[1], convertHelp("command", argc, argv).c_str() )) {
+			return convert(argc, argv);
+		}
 
-	//asking for a list of printings
-	if (!stricmp(argv[1], listHelp("command", argc, argv).c_str() )) {
-		return list(argc, argv);
+		//asking for a list of printings
+		if (!stricmp(argv[1], listHelp("command", argc, argv).c_str() )) {
+			return list(argc, argv);
+		}
+	}
+	catch (std::exception& e) {
+		std::cerr << "Fatal Exception Thrown: " << e.what() << std::endl;
+		return 1;
 	}
 
 	std::cout << "Unknown command" << std::endl;
